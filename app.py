@@ -7,13 +7,13 @@ from flask import (Flask, render_template, request, redirect,
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-prod')
+app.secret_key = os.environ.get('SECRET_KEY', '')
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, 'programbook.db')
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'sogang2024')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', '')
 
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB
 
