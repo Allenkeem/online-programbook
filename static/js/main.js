@@ -156,29 +156,21 @@ function circlesBgSVG() {
     return `<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice"
          xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
   <defs>
-    <!-- Full-circle paths: M cx+r,cy A r,r 0 1 0 cx-r,cy A r,r 0 1 0 cx+r,cy -->
     <path id="cbt1" d="M 440,140 A 210,210 0 1 0 20,140 A 210,210 0 1 0 440,140"/>
     <path id="cbt2" d="M 780,140 A 210,210 0 1 0 360,140 A 210,210 0 1 0 780,140"/>
     <path id="cbt3" d="M 610,350 A 210,210 0 1 0 190,350 A 210,210 0 1 0 610,350"/>
-    <filter id="cbglow" x="-200%" y="-200%" width="500%" height="500%">
-      <feGaussianBlur stdDeviation="18"/>
-    </filter>
-    <filter id="cbglow-sm" x="-150%" y="-150%" width="400%" height="400%">
-      <feGaussianBlur stdDeviation="3.5" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
 
   <!-- Circle strokes -->
   <circle cx="230" cy="140" r="210" fill="none" stroke="#1c1a17" stroke-width="1.1" opacity="0.26"/>
   <circle cx="570" cy="140" r="210" fill="none" stroke="#1c1a17" stroke-width="1.1" opacity="0.26"/>
   <circle cx="400" cy="350" r="210" fill="none" stroke="#1c1a17" stroke-width="1.1" opacity="0.26"/>
-  <!-- Inner rings for depth -->
+  <!-- Inner rings -->
   <circle cx="230" cy="140" r="201" fill="none" stroke="#1c1a17" stroke-width="0.5" opacity="0.08"/>
   <circle cx="570" cy="140" r="201" fill="none" stroke="#1c1a17" stroke-width="0.5" opacity="0.08"/>
   <circle cx="400" cy="350" r="201" fill="none" stroke="#1c1a17" stroke-width="0.5" opacity="0.08"/>
 
-  <!-- Curved text on each circle -->
+  <!-- Curved text -->
   <text font-family="Georgia,serif" font-size="9" fill="#1c1a17" opacity="0.28" letter-spacing="6">
     <textPath href="#cbt1">Eight by Eight by Eight  ·  Eight by Eight by Eight  ·  Eight by Eight by Eight  · </textPath>
   </text>
@@ -188,32 +180,6 @@ function circlesBgSVG() {
   <text font-family="Georgia,serif" font-size="9" fill="#1c1a17" opacity="0.28" letter-spacing="6">
     <textPath href="#cbt3" startOffset="66%">Eight by Eight by Eight  ·  Eight by Eight by Eight  ·  Eight by Eight by Eight  · </textPath>
   </text>
-
-  <!-- Lens-flare sparkles at pairwise intersection points (gold to match paper theme) -->
-  <!-- C1∩C2 lower — main central sparkle -->
-  <g transform="translate(400,263)">
-    <circle r="62" fill="#b8860b" opacity="0.10" filter="url(#cbglow)"/>
-    <rect x="-1.2" y="-42" width="2.4" height="84" fill="#b8860b" opacity="0.68" filter="url(#cbglow-sm)"/>
-    <rect x="-42" y="-1.2" width="84" height="2.4" fill="#b8860b" opacity="0.68" filter="url(#cbglow-sm)"/>
-    <rect x="-0.65" y="-27" width="1.3" height="54" fill="#b8860b" opacity="1" rx="0.5"/>
-    <rect x="-27" y="-0.65" width="54" height="1.3" fill="#b8860b" opacity="1" rx="0.5"/>
-  </g>
-  <!-- C1∩C3 upper -->
-  <g transform="translate(440,144)">
-    <circle r="42" fill="#b8860b" opacity="0.08" filter="url(#cbglow)"/>
-    <rect x="-0.95" y="-30" width="1.9" height="60" fill="#b8860b" opacity="0.55" filter="url(#cbglow-sm)"/>
-    <rect x="-30" y="-0.95" width="60" height="1.9" fill="#b8860b" opacity="0.55" filter="url(#cbglow-sm)"/>
-    <rect x="-0.55" y="-19" width="1.1" height="38" fill="#b8860b" opacity="0.96" rx="0.4"/>
-    <rect x="-19" y="-0.55" width="38" height="1.1" fill="#b8860b" opacity="0.96" rx="0.4"/>
-  </g>
-  <!-- C2∩C3 upper -->
-  <g transform="translate(360,144)">
-    <circle r="34" fill="#b8860b" opacity="0.07" filter="url(#cbglow)"/>
-    <rect x="-0.85" y="-24" width="1.7" height="48" fill="#b8860b" opacity="0.48" filter="url(#cbglow-sm)"/>
-    <rect x="-24" y="-0.85" width="48" height="1.7" fill="#b8860b" opacity="0.48" filter="url(#cbglow-sm)"/>
-    <rect x="-0.5" y="-15" width="1" height="30" fill="#b8860b" opacity="0.90" rx="0.3"/>
-    <rect x="-15" y="-0.5" width="30" height="1" fill="#b8860b" opacity="0.90" rx="0.3"/>
-  </g>
 </svg>`;
 }
 
@@ -225,9 +191,10 @@ function renderDetail(perf) {
 
     function section(label, content) {
         const idx = secIdx++;
-        const alt = idx % 2 === 1 ? ' section-alt' : '';
+        const cls = idx % 2 === 1 ? ' section-dark' : '';
         const num = String(idx + 1).padStart(2, '0');
-        return `<section class="detail-section${alt}">
+        const id = 'sec-' + label.replace(/\s+/g, '');
+        return `<section class="detail-section${cls}" id="${id}">
             <div class="section-inner">
                 <h3 class="section-label"><span class="section-label-num">${num}</span>${label}</h3>
                 ${content}
@@ -235,12 +202,23 @@ function renderDetail(perf) {
         </section>`;
     }
 
-    // ── Hero
+    // ── Hero + TOC
     const dateStr = fmtDate(perf.date_start, perf.date_end);
+    const plays = perf.plays || [];
+    const generalStaff = (perf.staff || []).filter(s => !s.play_name);
+    const hasGallery = perf.photos && perf.photos.length > 0;
+
+    const tocItems = [
+        { label: '기획의 말', id: 'sec-기획의말' },
+        { label: '시놉시스', id: 'sec-시놉시스' },
+        ...(plays.length > 0 ? [{ label: '공연', id: 'sec-공연' }] : []),
+        ...(generalStaff.length > 0 ? [{ label: '스태프', id: 'sec-스태프' }] : []),
+        ...(hasGallery ? [{ label: '갤러리', id: 'sec-갤러리' }] : []),
+    ];
+    const tocLinks = tocItems.map(t => `<a href="#${t.id}" class="toc-link">${esc(t.label)}</a>`).join('');
+
     html += `<div class="detail-hero">
-        <div class="poster-circles" aria-hidden="true">${circlesBgSVG()}</div>
         <div class="detail-hero-inner">
-            ${perf.poster ? `<div class="detail-hero-poster"><img src="${esc(perf.poster)}" alt="${esc(perf.title)}" loading="lazy"></div>` : ''}
             <div class="detail-hero-info">
                 ${perf.subtitle ? `<span class="detail-eyebrow">${esc(perf.subtitle)}</span>` : ''}
                 <h2 class="detail-title">${esc(perf.title)}</h2>
@@ -250,43 +228,91 @@ function renderDetail(perf) {
                 </div>
             </div>
         </div>
+        <nav class="detail-toc"><div class="detail-toc-inner">${tocLinks}</div></nav>
     </div>`;
 
-    // ── Play cards
-    const plays = perf.plays || [];
-    if (plays.length > 0) {
-        const cards = plays.map(play => {
-            return `<div class="team-nav-card" onclick="showTeam('${safeAttr(play.name)}')">
-                <div class="team-nav-card-inner">
-                    <span class="team-nav-title">${esc(play.name)}</span>
-                    ${play.description ? `<p class="team-nav-desc">${esc(play.description)}</p>` : ''}
-                </div>
-                <span class="team-nav-arrow">→</span>
-            </div>`;
-        }).join('');
-        html += section('공연', cards);
+    // ── 포스터
+    if (perf.poster) {
+        html += `<div class="detail-poster-section">
+            <img src="${esc(perf.poster)}" alt="${esc(perf.title)} 포스터" class="detail-poster-full">
+        </div>`;
     }
 
-    // ── Staff dept cards
-    const generalStaff = (perf.staff || []).filter(s => !s.play_name);
+    // ── 기획의 말
+    const greetingText = perf.greeting ||
+        '기획의 말이 아직 작성되지 않았습니다.\n어드민 페이지에서 입력해주세요.';
+    html += section('기획의 말', `<p class="greeting-text">${esc(greetingText)}</p>`);
+
+    // ── 시놉시스 (극별)
+    if (plays.length > 0) {
+        const synopsisBlocks = plays.map(play => {
+            const text = play.description ||
+                '시놉시스가 아직 작성되지 않았습니다.\n어드민 페이지에서 입력해주세요.';
+            return `<div class="synopsis-block">
+                <div class="synopsis-block-header">
+                    <span class="play-group-title">${esc(play.name)}</span>
+                </div>
+                <p class="synopsis-text">${esc(text)}</p>
+            </div>`;
+        }).join('');
+        html += section('시놉시스', synopsisBlocks);
+    }
+
+    // ── 공연 (극별 얼굴 → 팀 페이지)
+    if (plays.length > 0) {
+        const groups = plays.map(play => {
+            const cast = (perf.cast || []).filter(c => c.character === play.name);
+            const faceCards = cast.map(c => {
+                const imgs = (Array.isArray(c.photos) ? c.photos : [c.photos]).filter(Boolean);
+                const photo = imgs.length > 0
+                    ? `<img src="${esc(imgs[0])}" alt="${esc(c.actor)}" loading="lazy">`
+                    : `<div class="cast-photo-placeholder">☺</div>`;
+                return `<div class="cast-card cast-card-nav" onclick="showTeam('${safeAttr(play.name)}')">
+                    <div class="cast-photo">${photo}</div>
+                    <span class="cast-character">${esc(c.bio || '')}</span>
+                    <span class="cast-actor">${esc(c.actor)}</span>
+                </div>`;
+            }).join('');
+            return `<div class="play-group">
+                <div class="play-group-header" onclick="showTeam('${safeAttr(play.name)}')">
+                    <span class="play-group-title">${esc(play.name)}</span>
+                    <span class="play-group-arrow">→</span>
+                </div>
+                ${cast.length > 0 ? `<div class="cast-grid">${faceCards}</div>` : ''}
+            </div>`;
+        }).join('');
+        html += section('공연', groups);
+    }
+
+    // ── 스태프 (부서별 얼굴 → 부서 페이지)
     if (generalStaff.length > 0) {
         const depts = [...new Set(generalStaff.map(s => s.department).filter(Boolean))];
-        const cards = depts.map(dept => {
+        const groups = depts.map(dept => {
             const members = generalStaff.filter(s => s.department === dept);
-            const names = members.map(s => esc(s.name)).join(' · ');
-            return `<div class="team-nav-card" onclick="showStaffDept('${safeAttr(dept)}')">
-                <div class="team-nav-card-inner">
-                    <span class="team-nav-title">${esc(dept)}</span>
-                    <p class="team-nav-desc">${names}</p>
+            const faceCards = members.map(s => {
+                const imgs = (Array.isArray(s.photos) ? s.photos : [s.photos]).filter(Boolean);
+                const photo = imgs.length > 0
+                    ? `<img src="${esc(imgs[0])}" alt="${esc(s.name)}" loading="lazy">`
+                    : `<div class="cast-photo-placeholder">☺</div>`;
+                return `<div class="cast-card cast-card-nav" onclick="showStaffDept('${safeAttr(dept)}')">
+                    <div class="cast-photo">${photo}</div>
+                    <span class="cast-character">${esc(s.role || '')}</span>
+                    <span class="cast-actor">${esc(s.name)}</span>
+                </div>`;
+            }).join('');
+            return `<div class="play-group">
+                <div class="play-group-header" onclick="showStaffDept('${safeAttr(dept)}')">
+                    <span class="play-group-title">${esc(dept)}</span>
+                    <span class="play-group-arrow">→</span>
                 </div>
-                <span class="team-nav-arrow">→</span>
+                ${members.length > 0 ? `<div class="cast-grid">${faceCards}</div>` : ''}
             </div>`;
         }).join('');
-        html += section('스태프', cards);
+        html += section('스태프', groups);
     }
 
-    // ── Gallery
-    if (perf.photos && perf.photos.length > 0) {
+    // ── 갤러리
+    if (hasGallery) {
         currentGallery = perf.photos.map(p => p.src);
         const items = perf.photos.map((p, i) =>
             `<div class="gallery-item" onclick="openLightbox(${i})"><img src="${esc(p.src)}" alt="${esc(p.caption || '')}" loading="lazy"></div>`
@@ -297,6 +323,7 @@ function renderDetail(perf) {
     }
 
     el.innerHTML = html;
+    initCarousels(el);
 }
 
 // ── Play Team Detail ──────────────────────────────────────────────────────────
@@ -307,9 +334,9 @@ function renderTeam(perf, teamName) {
 
     function section(label, content) {
         const idx = secIdx++;
-        const alt = idx % 2 === 1 ? ' section-alt' : '';
+        const cls = idx % 2 === 1 ? ' section-dark' : '';
         const num = String(idx + 1).padStart(2, '0');
-        return `<section class="detail-section${alt}">
+        return `<section class="detail-section${cls}">
             <div class="section-inner">
                 <h3 class="section-label"><span class="section-label-num">${num}</span>${label}</h3>
                 ${content}

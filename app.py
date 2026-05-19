@@ -7,7 +7,7 @@ from flask import (Flask, render_template, request, redirect,
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', '')
+app.secret_key = os.environ.get('SECRET_KEY') or 'dev-local-fallback-key-change-in-prod'
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, 'programbook.db')
