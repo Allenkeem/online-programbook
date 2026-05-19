@@ -224,10 +224,12 @@ function renderDetail(perf) {
     let secIdx = 0;
 
     function section(label, content) {
-        const alt = secIdx++ % 2 === 1 ? ' section-alt' : '';
+        const idx = secIdx++;
+        const alt = idx % 2 === 1 ? ' section-alt' : '';
+        const num = String(idx + 1).padStart(2, '0');
         return `<section class="detail-section${alt}">
             <div class="section-inner">
-                <h3 class="section-label">${label}</h3>
+                <h3 class="section-label"><span class="section-label-num">${num}</span>${label}</h3>
                 ${content}
             </div>
         </section>`;
@@ -304,10 +306,12 @@ function renderTeam(perf, teamName) {
     let secIdx = 0;
 
     function section(label, content) {
-        const alt = secIdx++ % 2 === 1 ? ' section-alt' : '';
+        const idx = secIdx++;
+        const alt = idx % 2 === 1 ? ' section-alt' : '';
+        const num = String(idx + 1).padStart(2, '0');
         return `<section class="detail-section${alt}">
             <div class="section-inner">
-                <h3 class="section-label">${label}</h3>
+                <h3 class="section-label"><span class="section-label-num">${num}</span>${label}</h3>
                 ${content}
             </div>
         </section>`;

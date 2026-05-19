@@ -426,12 +426,34 @@ button { font-family: inherit; }
 }
 
 .section-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     font-size: 0.66rem;
     font-weight: 700;
     color: var(--text-subtle);
     letter-spacing: 0.15em;
     text-transform: uppercase;
     margin-bottom: 1.5rem;
+}
+
+.section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-hover);
+}
+
+.section-label-num {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 0.88rem;
+    font-weight: 400;
+    color: var(--primary);
+    opacity: 0.75;
+    letter-spacing: 0;
+    text-transform: none;
+    flex-shrink: 0;
 }
 
 .synopsis-text,
@@ -463,8 +485,8 @@ button { font-family: inherit; }
 
 .cast-photo {
     width: 100%;
-    aspect-ratio: 3 / 4;
-    border-radius: var(--radius-md);
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
     overflow: hidden;
     background: var(--bg-elevated);
     border: 1px solid var(--border);
@@ -565,10 +587,10 @@ button { font-family: inherit; }
 .cast-actor {
     display: block;
     font-family: 'Noto Serif KR', 'KoPub Batang', Georgia, serif;
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
     color: var(--text);
-    letter-spacing: 0px;
+    letter-spacing: -0.2px;
 }
 
 .cast-bio {
@@ -840,9 +862,9 @@ button { font-family: inherit; }
 
 .profile-photo-img {
     width: 100%;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
-    border-radius: var(--radius-md);
+    border-radius: 50%;
     display: block;
 }
 
@@ -852,9 +874,9 @@ button { font-family: inherit; }
 
 .profile-photo-placeholder {
     width: 100%;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1;
     background: var(--bg-elevated);
-    border-radius: var(--radius-md);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -864,7 +886,7 @@ button { font-family: inherit; }
 
 .profile-photo-carousel {
     width: 100%;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1;
 }
 
 .profile-info {
