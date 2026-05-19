@@ -1,0 +1,682 @@
+{% extends 'base_admin.html' %}
+{% block title %}{% if performance %}{{ performance.title }} 수정{% else %}새 공연 추가{% endif %} — 관리자{% endblock %}
+{% block content %}
+<div class="container py-5">
+
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{{ url_for('admin_dashboard') }}" style="color: #666; text-decoration: none;">← 목록</a>
+    <h2 class="section-title mb-0">
+      {% if performance %}{{ performance.title }} 수정{% else %}새 공연 추가{% endif %}
+    </h2>
+  </div>
+
+  {% if performance %}
+  <!-- 탭 네비게이션 -->
+  <ul class="nav nav-tabs mb-4" id="adminTabs">
+    <li class="nav-item">
+      <a class="nav-link active" href="#info" data-bs-toggle="tab">
+        <i class="bi bi-info-circle me-1"></i>기본정보
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#cast" data-bs-toggle="tab">
+        <i class="bi bi-people me-1"></i>출연진
+        <span class="badge bg-secondary ms-1">{{ cast|length }}</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#staff" data-bs-toggle="tab">
+        <i class="bi bi-person-gear me-1"></i>스태프
+        <span class="badge bg-secondary ms-1">{{ staff|length }}</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#photos" data-bs-toggle="tab">
+        <i class="bi bi-images me-1"></i>사진
+        <span class="badge bg-secondary ms-1">{{ photos|length }}</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#plays" data-bs-toggle="tab">
+        <i class="bi bi-journal-text me-1"></i>극 정보
+        <span class="badge bg-secondary ms-1">{{ plays|length }}</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#depts" data-bs-toggle="tab">
+        <i class="bi bi-card-text me-1"></i>팀 설명
+        <span class="badge bg-secondary ms-1">{{ departments|length }}</span>
+      </a>
+    </li>
+  </ul>
+  {% endif %}
+
+  <div class="tab-content">
+
+    <!-- 기본정보 탭 -->
+    <div class="tab-pane fade show active" id="info">
+      <form method="POST"
+            action="{{ url_for('admin_edit_performance', id=performance.id) if performance else url_for('admin_new_performance') }}"
+            enctype="multipart/form-data">
+        <div class="row g-3">
+
+          <div class="col-md-8">
+            <label class="form-label">공연 제목 <span style="color: #c9a84c;">*</span></label>
+            <input type="text" class="form-control bg-dark text-light border-secondary"
+                   name="title" value="{{ performance.title if performance else '' }}" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">부제목</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary"
+                   name="subtitle" value="{{ performance.subtitle if performance else '' }}">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">공연 시작일</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary"
+                   name="date_start"
+                   value="{{ performance.date_start if performance else '' }}"
+                   placeholder="예: 2024.05.10">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">공연 종료일</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary"
+                   name="date_end"
+                   value="{{ performance.date_end if performance else '' }}"
+                   placeholder="예: 2024.05.12">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">공연 장소</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary"
+                   name="venue" value="{{ performance.venue if performance else '' }}"
+                   placeholder="예: 서강대 메리홀">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">인사말</label>
+            <textarea class="form-control bg-dark text-light border-secondary"
+                      name="greeting" rows="5"
+                      placeholder="관객에게 전하는 인사말을 입력하세요.">{{ performance.greeting if performance else '' }}</textarea>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">작품 소개 (시놉시스)</label>
+            <textarea class="form-control bg-dark text-light border-secondary"
+                      name="synopsis" rows="6"
+                      placeholder="작품 소개 및 시놉시스를 입력하세요.">{{ performance.synopsis if performance else '' }}</textarea>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">포스터 이미지</label>
+            <input type="file" class="form-control bg-dark text-light border-secondary"
+                   name="poster" accept="image/*">
+            {% if performance and performance.poster_filename %}
+            <div class="mt-2">
+              <img src="{{ url_for('static', filename='uploads/' + performance.poster_filename) }}"
+                   height="120" class="rounded" style="border: 1px solid #2a2a2a;">
+              <small class="text-muted d-block mt-1">새 파일 선택 시 교체됩니다.</small>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">질문 1 <small style="color:#888;">(멤버 프로필에 표시될 질문)</small></label>
+            <input type="text" class="form-control bg-dark text-light border-secondary"
+                   name="q1_text" value="{{ performance.q1_text if performance else '' }}"
+                   placeholder="예: 이번 공연을 한마디로 표현한다면?">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">질문 2</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary"
+                   name="q2_text" value="{{ performance.q2_text if performance else '' }}"
+                   placeholder="예: 관객에게 전하고 싶은 말은?">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">공개 여부</label>
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" name="is_published"
+                     id="is_published"
+                     {% if not performance or performance.is_published %}checked{% endif %}>
+              <label class="form-check-label" for="is_published" style="color: #e8e2d9;">
+                공개 (체크 해제 시 비공개)
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12 mt-2">
+            <button type="submit" class="btn btn-gold me-2">
+              <i class="bi bi-check2 me-1"></i>저장
+            </button>
+            {% if performance %}
+            <a href="{{ url_for('performance_detail', id=performance.id) }}"
+               class="btn btn-outline-secondary" target="_blank">
+              <i class="bi bi-eye me-1"></i>미리보기
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </form>
+    </div>
+
+    {% if performance %}
+
+    <!-- 출연진 탭 -->
+    <div class="tab-pane fade" id="cast">
+      <div class="card p-4 mb-4">
+        <h6 class="mb-3" style="color: #c9a84c;">출연진 추가</h6>
+        <form method="POST"
+              action="{{ url_for('admin_add_cast', perf_id=performance.id) }}"
+              enctype="multipart/form-data">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-2">
+              <label class="form-label small">배역명</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="character_name" placeholder="홍길동 역">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">배우명 *</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="actor_name" placeholder="김서강" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">소개</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="actor_bio" placeholder="작·연출">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">한줄 메시지</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="message" placeholder="개인 한마디">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">사진 (최대 3장)</label>
+              <input type="file" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="actor_photos" accept="image/*" multiple>
+            </div>
+            <div class="col-md-1">
+              <label class="form-label small">순서</label>
+              <input type="number" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="sort_order" value="0">
+            </div>
+            <div class="col-md-1">
+              <button type="submit" class="btn btn-gold btn-sm w-100">추가</button>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">질문 1 답변</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="q1" placeholder="{{ performance.q1_text or '질문 1 답변' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">질문 2 답변</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="q2" placeholder="{{ performance.q2_text or '질문 2 답변' }}">
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {% if cast %}
+      <div class="row g-3">
+        {% for c in cast %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card p-3">
+            <div class="d-flex flex-row align-items-center gap-3">
+              {% if c.actor_photo %}
+              <img src="{{ url_for('static', filename='uploads/' + c.actor_photo) }}"
+                   width="56" height="56"
+                   style="border-radius:50%;object-fit:cover;border:2px solid #c9a84c;flex-shrink:0;">
+              {% else %}
+              <div style="width:56px;height:56px;border-radius:50%;background:#2a2a2a;
+                          border:2px solid #c9a84c;display:flex;align-items:center;
+                          justify-content:center;flex-shrink:0;">
+                <i class="bi bi-person" style="color:#c9a84c;"></i>
+              </div>
+              {% endif %}
+              <div class="flex-grow-1 min-w-0">
+                <div class="small" style="color:#c9a84c;">{{ c.character_name or '—' }}</div>
+                <div class="fw-semibold text-truncate">{{ c.actor_name }}</div>
+                {% if c.actor_bio %}<div class="small" style="color:#666;">{{ c.actor_bio }}</div>{% endif %}
+                {% if c.message %}<div class="small fst-italic" style="color:#888;">{{ c.message }}</div>{% endif %}
+              </div>
+              <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-outline-secondary" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#edit-c-{{ c.id }}">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <form method="POST" action="{{ url_for('admin_delete_cast', id=c.id) }}"
+                      onsubmit="return confirm('삭제하시겠습니까?')">
+                  <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+            <div class="collapse mt-3" id="edit-c-{{ c.id }}">
+              <form method="POST" action="{{ url_for('admin_edit_cast', id=c.id) }}"
+                    enctype="multipart/form-data">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label small">소속 극</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="character_name" value="{{ c.character_name or '' }}" placeholder="극 1 · 찰리">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">역할</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="actor_bio" value="{{ c.actor_bio or '' }}" placeholder="작·연출">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">이름 *</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="actor_name" value="{{ c.actor_name }}" required>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">한줄 메시지</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="message" value="{{ c.message or '' }}" placeholder="개인 한마디">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">질문 1 답변 <span style="color:#666;">({{ performance.q1_text or 'Q1' }})</span></label>
+                    <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                              name="q1" rows="2">{{ c.q1 or '' }}</textarea>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">질문 2 답변 <span style="color:#666;">({{ performance.q2_text or 'Q2' }})</span></label>
+                    <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                              name="q2" rows="2">{{ c.q2 or '' }}</textarea>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">사진 교체 (최대 3장, 선택 시 기존 사진 대체)</label>
+                    <input type="file" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="actor_photos" accept="image/*" multiple>
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label small">순서</label>
+                    <input type="number" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="sort_order" value="{{ c.sort_order }}">
+                  </div>
+                  <div class="col-8 d-flex align-items-end">
+                    <button type="submit" class="btn btn-gold btn-sm w-100">저장</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="color: #666;">출연진이 없습니다. 위에서 추가해주세요.</p>
+      {% endif %}
+    </div>
+
+    <!-- 스태프 탭 -->
+    <div class="tab-pane fade" id="staff">
+      <div class="card p-4 mb-4">
+        <h6 class="mb-3" style="color: #c9a84c;">스태프 추가</h6>
+        <form method="POST"
+              action="{{ url_for('admin_add_staff', perf_id=performance.id) }}"
+              enctype="multipart/form-data">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-2">
+              <label class="form-label small">소속 극</label>
+              <select class="form-select form-select-sm bg-dark text-light border-secondary"
+                      name="play_name">
+                <option value="">공통 스태프</option>
+                {% for play in plays %}
+                <option value="{{ play.name }}">{{ play.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">분야</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="department" placeholder="기획, 무대, 조명…">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">이름 *</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="name" placeholder="이름" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">한줄 메시지</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="message" placeholder="개인 한마디">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">사진 (최대 3장)</label>
+              <input type="file" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="photos" accept="image/*" multiple>
+            </div>
+            <div class="col-md-1">
+              <label class="form-label small">순서</label>
+              <input type="number" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="sort_order" value="0">
+            </div>
+            <div class="col-md-1">
+              <button type="submit" class="btn btn-gold btn-sm w-100">추가</button>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">질문 1 답변</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="q1" placeholder="{{ performance.q1_text or '질문 1 답변' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">질문 2 답변</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="q2" placeholder="{{ performance.q2_text or '질문 2 답변' }}">
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {% if staff %}
+      <div class="row g-3">
+        {% for s in staff %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card p-3">
+            <div class="d-flex flex-row align-items-center gap-3">
+              {% if s.photo %}
+              <img src="{{ url_for('static', filename='uploads/' + s.photo) }}"
+                   width="56" height="56"
+                   style="border-radius:50%;object-fit:cover;border:2px solid #c9a84c;flex-shrink:0;">
+              {% else %}
+              <div style="width:56px;height:56px;border-radius:50%;background:#2a2a2a;
+                          border:2px solid #444;display:flex;align-items:center;
+                          justify-content:center;flex-shrink:0;">
+                <i class="bi bi-person" style="color:#666;"></i>
+              </div>
+              {% endif %}
+              <div class="flex-grow-1 min-w-0">
+                {% if s.play_name %}<div class="small" style="color:#c9a84c;">{{ s.play_name }}</div>{% endif %}
+                <div class="fw-semibold text-truncate">{{ s.name }}</div>
+                {% if s.department %}<div class="small" style="color:#666;">{{ s.department }}</div>{% endif %}
+                {% if s.message %}<div class="small fst-italic" style="color:#888;">{{ s.message }}</div>{% endif %}
+              </div>
+              <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-outline-secondary" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#edit-s-{{ s.id }}">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <form method="POST" action="{{ url_for('admin_delete_staff', id=s.id) }}"
+                      onsubmit="return confirm('삭제하시겠습니까?')">
+                  <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+            <div class="collapse mt-3" id="edit-s-{{ s.id }}">
+              <form method="POST" action="{{ url_for('admin_edit_staff', id=s.id) }}"
+                    enctype="multipart/form-data">
+                <div class="row g-2">
+                  <div class="col-12">
+                    <label class="form-label small">소속 극</label>
+                    <select class="form-select form-select-sm bg-dark text-light border-secondary" name="play_name">
+                      <option value="" {% if not s.play_name %}selected{% endif %}>공통 스태프</option>
+                      {% for play in plays %}
+                      <option value="{{ play.name }}" {% if s.play_name == play.name %}selected{% endif %}>{{ play.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">분야</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="department" value="{{ s.department or '' }}">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">이름 *</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="name" value="{{ s.name }}" required>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">한줄 메시지</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="message" value="{{ s.message or '' }}" placeholder="개인 한마디">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">질문 1 답변 <span style="color:#666;">({{ performance.q1_text or 'Q1' }})</span></label>
+                    <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                              name="q1" rows="2">{{ s.q1 or '' }}</textarea>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">질문 2 답변 <span style="color:#666;">({{ performance.q2_text or 'Q2' }})</span></label>
+                    <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                              name="q2" rows="2">{{ s.q2 or '' }}</textarea>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">사진 교체 (최대 3장, 선택 시 기존 사진 대체)</label>
+                    <input type="file" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="photos" accept="image/*" multiple>
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label small">순서</label>
+                    <input type="number" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="sort_order" value="{{ s.sort_order }}">
+                  </div>
+                  <div class="col-8 d-flex align-items-end">
+                    <button type="submit" class="btn btn-gold btn-sm w-100">저장</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="color: #666;">스태프가 없습니다. 위에서 추가해주세요.</p>
+      {% endif %}
+    </div>
+
+    <!-- 사진 탭 -->
+    <div class="tab-pane fade" id="photos">
+      <div class="card p-4 mb-4">
+        <h6 class="mb-3" style="color: #c9a84c;">사진 업로드</h6>
+        <form method="POST"
+              action="{{ url_for('admin_add_photos', perf_id=performance.id) }}"
+              enctype="multipart/form-data">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-7">
+              <label class="form-label small">이미지 파일 (여러 장 동시 선택 가능)</label>
+              <input type="file" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="photos" accept="image/*" multiple required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small">캡션 (선택)</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="caption" placeholder="사진 설명">
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-gold btn-sm w-100">업로드</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {% if photos %}
+      <div class="row g-3">
+        {% for photo in photos %}
+        <div class="col-6 col-md-3 col-lg-2">
+          <div class="card p-2">
+            <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}"
+                 class="img-fluid rounded mb-2"
+                 style="height: 120px; object-fit: cover; width: 100%;">
+            {% if photo.caption %}
+            <p class="small mb-1" style="color: #9a9488; font-size: 0.75rem;">{{ photo.caption }}</p>
+            {% endif %}
+            <form method="POST" action="{{ url_for('admin_delete_photo', id=photo.id) }}"
+                  onsubmit="return confirm('사진을 삭제하시겠습니까?')">
+              <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="color: #666;">업로드된 사진이 없습니다.</p>
+      {% endif %}
+    </div>
+
+    <!-- 극 정보 탭 -->
+    <div class="tab-pane fade" id="plays">
+      <div class="card p-4 mb-4">
+        <h6 class="mb-1" style="color: #c9a84c;">극 정보 추가</h6>
+        <p class="small mb-3" style="color: #666;">극 이름은 출연진의 배역명 그룹과 동일하게 입력하세요. (예: 극 1 · 찰리)</p>
+        <form method="POST" action="{{ url_for('admin_add_play', perf_id=performance.id) }}">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label small">극 이름 *</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="name" placeholder="극 1 · 찰리" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">방향성 / 한줄평</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="description" placeholder="이 극에 대한 방향성이나 한줄평을 입력하세요.">
+            </div>
+            <div class="col-md-1">
+              <label class="form-label small">순서</label>
+              <input type="number" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="sort_order" value="0">
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-gold btn-sm w-100">추가</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {% if plays %}
+      <div class="d-flex flex-column gap-3">
+        {% for play in plays %}
+        <div class="card p-3">
+          <form method="POST" action="{{ url_for('admin_edit_play', id=play.id) }}">
+            <div class="row g-2 align-items-end">
+              <div class="col-md-3">
+                <label class="form-label small">극 이름</label>
+                <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                       name="name" value="{{ play.name }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">방향성 / 한줄평</label>
+                <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                          name="description" rows="2">{{ play.description }}</textarea>
+              </div>
+              <div class="col-md-1">
+                <label class="form-label small">순서</label>
+                <input type="number" class="form-control form-control-sm bg-dark text-light border-secondary"
+                       name="sort_order" value="{{ play.sort_order }}">
+              </div>
+              <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-gold btn-sm flex-grow-1">저장</button>
+                <form method="POST" action="{{ url_for('admin_delete_play', id=play.id) }}"
+                      onsubmit="return confirm('삭제하시겠습니까?')" class="m-0">
+                  <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="color: #666;">극 정보가 없습니다. 위에서 추가해주세요.</p>
+      {% endif %}
+    </div>
+
+    <!-- 팀 설명 탭 -->
+    <div class="tab-pane fade" id="depts">
+      <div class="card p-4 mb-4">
+        <h6 class="mb-1" style="color: #c9a84c;">팀 설명 추가</h6>
+        <p class="small mb-3" style="color: #666;">팀 이름은 스태프의 분야(department)와 동일하게 입력하세요. (예: 기획팀, 무대팀)</p>
+        <form method="POST" action="{{ url_for('admin_add_department', perf_id=performance.id) }}">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label small">팀 이름 *</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="name" placeholder="기획팀" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">팀 설명 / 방향성</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="description" placeholder="이 팀에 대한 소개나 방향성을 입력하세요.">
+            </div>
+            <div class="col-md-1">
+              <label class="form-label small">순서</label>
+              <input type="number" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="sort_order" value="0">
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-gold btn-sm w-100">추가</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {% if departments %}
+      <div class="d-flex flex-column gap-3">
+        {% for dept in departments %}
+        <div class="card p-3">
+          <form method="POST" action="{{ url_for('admin_edit_department', id=dept.id) }}">
+            <div class="row g-2 align-items-end">
+              <div class="col-md-3">
+                <label class="form-label small">팀 이름</label>
+                <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                       name="name" value="{{ dept.name }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">팀 설명</label>
+                <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                          name="description" rows="2">{{ dept.description }}</textarea>
+              </div>
+              <div class="col-md-1">
+                <label class="form-label small">순서</label>
+                <input type="number" class="form-control form-control-sm bg-dark text-light border-secondary"
+                       name="sort_order" value="{{ dept.sort_order }}">
+              </div>
+              <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-gold btn-sm flex-grow-1">저장</button>
+                <form method="POST" action="{{ url_for('admin_delete_department', id=dept.id) }}"
+                      onsubmit="return confirm('삭제하시겠습니까?')" class="m-0">
+                  <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="color: #666;">팀 설명이 없습니다. 위에서 추가해주세요.</p>
+      {% endif %}
+    </div>
+
+    {% endif %}
+  </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const hash = window.location.hash;
+  if (hash) {
+    const tab = document.querySelector(`[href="${hash}"][data-bs-toggle="tab"]`);
+    if (tab) new bootstrap.Tab(tab).show();
+  }
+  document.querySelectorAll('[data-bs-toggle="tab"]').forEach(function(tab) {
+    tab.addEventListener('shown.bs.tab', function(e) {
+      history.replaceState(null, null, e.target.getAttribute('href'));
+    });
+  });
+});
+</script>
+{% endblock %}
+{% endblock %}

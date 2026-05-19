@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<script>
+const PROGRAMBOOK_DATA = {{ programbook_data | tojson }};
+</script>
+
+<!-- DETAIL VIEW (공연 개요 + 팀 카드) -->
+<div id="view-detail" class="view-section active">
+  <div id="detail-content"></div>
+</div>
+
+<!-- TEAM VIEW (팀 상세) -->
+<div id="view-team" class="view-section">
+  <header class="sub-header">
+    <button class="btn-back" onclick="showDetailFromTeam()">← 뒤로</button>
+    <span class="sub-header-title" id="team-header-title"></span>
+  </header>
+  <div id="team-content"></div>
+</div>
+
+<!-- Profile Modal -->
+<div class="profile-overlay" id="profile-overlay" onclick="closePersonProfile()">
+  <div class="profile-modal" onclick="event.stopPropagation()">
+    <button class="profile-close" onclick="closePersonProfile()">✕</button>
+    <div class="profile-modal-inner">
+      <div class="profile-photo-area" id="profile-photo-area"></div>
+      <div class="profile-info">
+        <span class="profile-role" id="profile-role"></span>
+        <h3 class="profile-name" id="profile-name"></h3>
+        <p class="profile-message" id="profile-message"></p>
+        <div class="profile-qa" id="profile-qa"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox (gallery only) -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
+  <button class="lightbox-prev" onclick="event.stopPropagation();lightboxNav(-1)">‹</button>
+  <img id="lightbox-img" src="" alt="">
+  <button class="lightbox-next" onclick="event.stopPropagation();lightboxNav(1)">›</button>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base_admin.html' %}
+{% block title %}관리자 로그인{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+  <div class="card p-5" style="width: 380px;">
+    <div class="text-center mb-4">
+      <i class="bi bi-shield-lock" style="font-size: 2.5rem; color: #c9a84c;"></i>
+      <h4 class="mt-2" style="font-family: 'Playfair Display', serif; color: #e8e2d9;">관리자 로그인</h4>
+    </div>
+    <form method="POST">
+      <div class="mb-3">
+        <input type="password"
+               class="form-control bg-dark text-light border-secondary"
+               name="password" placeholder="비밀번호" required autofocus>
+      </div>
+      <button type="submit" class="btn btn-gold w-100">로그인</button>
+    </form>
+    <div class="text-center mt-3">
+      <a href="{{ url_for('index') }}" class="small" style="color: #666;">← 사이트로 돌아가기</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

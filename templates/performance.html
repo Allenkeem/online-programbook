@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% block title %}{{ performance.title }} — 서강연극회{% endblock %}
+{% block content %}
+<div id="view-detail" class="view-section active">
+
+  <header class="sub-header">
+    <a href="{{ url_for('index') }}" class="btn-back">← 목록</a>
+    <span class="sub-header-title">{{ performance.title }}</span>
+    {% if session.get('admin') %}
+    <a href="{{ url_for('admin_edit_performance', id=performance.id) }}" class="btn-back" style="margin-left:auto;">수정</a>
+    {% endif %}
+  </header>
+
+  <!-- Hero -->
+  <div class="detail-hero">
+    <div class="detail-hero-inner">
+      {% if performance.poster_filename %}
+      <div class="detail-hero-poster">
+        <img src="{{ url_for('static', filename='uploads/' + performance.poster_filename) }}" alt="{{ performance.title }}">
+      </div>
+      {% endif %}
+      <div class="detail-hero-info">
+        <span class="detail-eyebrow">서강연극회</span>
+        <h1 class="detail-title">{{ performance.title }}</h1>
+        {% if performance.subtitle %}
+        <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.2rem;">{{ performance.subtitle }}</p>
+        {% endif %}
+        <div class="detail-info-grid">
+          {% if performance.date_start %}
+          <div class="detail-info-item">
+            <span class="detail-info-label">일자</span>
+            <span class="detail-info-value">{{ performance.date_start }}{% if performance.date_end %} — {{ performance.date_end }}{% endif %}</span>
+          </div>
+          {% endif %}
+          {% if performance.venue %}
+          <div class="detail-info-item">
+            <span class="detail-info-label">장소</span>
+            <span class="detail-info-value">{{ performance.venue }}</span>
+          </div>
+          {% endif %}
+        </div>
+        {% if photos %}
+        <div style="margin-top:1.5rem;">
+          <a href="{{ url_for('gallery', p=performance.id) }}" class="btn-back">사진 갤러리 →</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 인사말 -->
+  {% if performance.greeting %}
+  <div class="detail-section">
+    <div class="section-inner">
+      <p class="section-label">인사말</p>
+      <div class="greeting-text">{{ performance.greeting }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- 작품 소개 -->
+  {% if performance.synopsis %}
+  <div class="detail-section section-alt">
+    <div class="section-inner">
+      <p class="section-label">작품 소개</p>
+      <div class="synopsis-text">{{ performance.synopsis }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- 출연진 (극별 그룹) -->
+  {% if cast_by_play %}
+  <div class="detail-section">
+    <div class="section-inner">
+      <p class="section-label">출연진</p>
+      {% for play_name, members in cast_by_play.items() %}
+      <div style="margin-bottom:2.5rem;">
+        {% if play_name %}
+        <h3 style="font-size:0.95rem;font-weight:700;color:var(--primary);margin-bottom:0.6rem;letter-spacing:-0.2px;">{{ play_name }}</h3>
+        {% endif %}
+        {% set desc = plays_by_name.get(play_name, '') %}
+        {% if desc %}
+        <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.75;margin-bottom:1.2rem;font-style:italic;padding-left:0.1rem;border-left:2px solid rgba(232,184,75,0.3);padding-left:0.8rem;">{{ desc }}</p>
+        {% endif %}
+        <div class="cast-grid">
+          {% for member in members %}
+          <div class="cast-card">
+            <div class="cast-photo">
+              {% if member.actor_photo %}
+              <img src="{{ url_for('static', filename='uploads/' + member.actor_photo) }}" alt="{{ member.actor_name }}">
+              {% else %}
+              <div class="cast-photo-placeholder">☺</div>
+              {% endif %}
+            </div>
+            {% if member.actor_bio %}
+            <span class="cast-character">{{ member.actor_bio }}</span>
+            {% endif %}
+            <span class="cast-actor">{{ member.actor_name }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- 스태프 -->
+  {% if staff_by_dept %}
+  <div class="detail-section section-alt">
+    <div class="section-inner">
+      <p class="section-label">스태프</p>
+      <div class="staff-grid">
+        {% for dept, members in staff_by_dept.items() %}
+        <div class="staff-group">
+          <span class="staff-dept">{{ dept }}</span>
+          <span class="staff-names">{{ members | map(attribute='name') | join(' · ') }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- 공연 사진 -->
+  {% if photos %}
+  <div class="detail-section">
+    <div class="section-inner">
+      <p class="section-label">공연 사진</p>
+      <div class="gallery-grid">
+        {% for photo in photos %}
+        <div class="gallery-item" onclick="openLightbox({{ loop.index0 }})">
+          <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}"
+               alt="{{ photo.caption }}" loading="lazy">
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
+  <button class="lightbox-prev" onclick="event.stopPropagation();lightboxNav(-1)">‹</button>
+  <img id="lightbox-img" src="" alt="">
+  <button class="lightbox-next" onclick="event.stopPropagation();lightboxNav(1)">›</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const perfPhotos = [{% for p in photos %}"{{ url_for('static', filename='uploads/' + p.filename) }}"{% if not loop.last %},{% endif %}{% endfor %}];
+let perfLbIdx = 0;
+function openLightbox(idx) {
+  if (!perfPhotos.length) return;
+  perfLbIdx = ((idx % perfPhotos.length) + perfPhotos.length) % perfPhotos.length;
+  document.getElementById('lightbox-img').src = perfPhotos[perfLbIdx];
+  document.getElementById('lightbox').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+  document.getElementById('lightbox-img').src = '';
+  document.body.style.overflow = '';
+}
+function lightboxNav(dir, e) {
+  if (e) e.stopPropagation();
+  openLightbox(perfLbIdx + dir);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') lightboxNav(-1);
+  if (e.key === 'ArrowRight') lightboxNav(1);
+});
+</script>
+{% endblock %}

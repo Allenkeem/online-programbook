@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>서강연극회 프로그램북</title>
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+</head>
+<body>
+
+  <!-- ── VIEW 1: LANDING ─────────────────────────────────── -->
+  <div id="view-landing" class="view-section active">
+    <section class="landing-hero">
+      <div class="landing-circles" aria-hidden="true">
+        <div class="lc lc-1"></div>
+        <div class="lc lc-2"></div>
+        <div class="lc lc-3"></div>
+        <div class="lc lc-4"></div>
+      </div>
+      <div class="landing-content">
+        <span class="landing-eyebrow" id="club-name">서강연극회</span>
+        <h1>프로그램북</h1>
+        <div class="landing-ornament"><span>✦</span></div>
+        <div id="perf-list" class="perf-list"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── VIEW 2: PERFORMANCE DETAIL ─────────────────────── -->
+  <div id="view-detail" class="view-section">
+    <header class="sub-header">
+      <button class="btn-back" onclick="showLanding()">← 목록으로</button>
+      <span id="detail-header-title" class="sub-header-title"></span>
+    </header>
+    <div id="detail-content"></div>
+  </div>
+
+  <!-- ── LIGHTBOX ───────────────────────────────────────── -->
+  <div id="lightbox" class="lightbox-overlay" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="닫기">✕</button>
+    <button class="lightbox-prev" onclick="lightboxNav(-1, event)" aria-label="이전">‹</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-next" onclick="lightboxNav(1, event)" aria-label="다음">›</button>
+  </div>
+
+  <!-- ── PAGE TRANSITION ────────────────────────────────── -->
+  <div id="page-overlay" class="page-overlay"></div>
+
+  <script src="data/data.js"></script>
+  <script src="static/js/main.js"></script>
+</body>
+</html>

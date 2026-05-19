@@ -1,0 +1,67 @@
+{% extends 'base_admin.html' %}
+{% block title %}관리자 대시보드{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="section-title mb-0">공연 관리</h2>
+    <a href="{{ url_for('admin_new_performance') }}" class="btn btn-gold">
+      <i class="bi bi-plus-lg me-1"></i>새 공연 추가
+    </a>
+  </div>
+
+  {% if performances %}
+  <div class="table-responsive">
+    <table class="table table-dark table-hover align-middle">
+      <thead>
+        <tr style="border-color: #2a2a2a;">
+          <th style="color: #c9a84c;">제목</th>
+          <th style="color: #c9a84c;">공연 기간</th>
+          <th style="color: #c9a84c;">장소</th>
+          <th style="color: #c9a84c;">상태</th>
+          <th style="color: #c9a84c;">관리</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in performances %}
+        <tr style="border-color: #2a2a2a;">
+          <td>
+            <a href="{{ url_for('performance_detail', id=p.id) }}"
+               class="text-decoration-none" style="color: #e8e2d9;">{{ p.title }}</a>
+            {% if p.subtitle %}
+            <span class="small ms-1" style="color: #666;">— {{ p.subtitle }}</span>
+            {% endif %}
+          </td>
+          <td class="small" style="color: #9a9488;">
+            {{ p.date_start or '-' }}{% if p.date_end %} ~ {{ p.date_end }}{% endif %}
+          </td>
+          <td class="small" style="color: #9a9488;">{{ p.venue or '-' }}</td>
+          <td>
+            {% if p.is_published %}
+            <span class="badge" style="background: #c9a84c; color: #000;">공개</span>
+            {% else %}
+            <span class="badge bg-secondary">비공개</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('admin_edit_performance', id=p.id) }}"
+               class="btn btn-sm btn-outline-gold me-1">수정</a>
+            <form method="POST" action="{{ url_for('admin_delete_performance', id=p.id) }}"
+                  class="d-inline"
+                  onsubmit="return confirm('정말 삭제하시겠습니까?\n삭제된 데이터는 복구되지 않습니다.')">
+              <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-masks-theater" style="font-size: 4rem; color: #c9a84c; opacity: 0.4;"></i>
+    <p class="mt-3" style="color: #666;">등록된 공연이 없습니다.</p>
+    <a href="{{ url_for('admin_new_performance') }}" class="btn btn-gold mt-2">첫 공연 추가하기</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
