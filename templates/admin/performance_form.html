@@ -164,9 +164,14 @@
               enctype="multipart/form-data">
           <div class="row g-2 align-items-end">
             <div class="col-md-2">
+              <label class="form-label small">소속 극</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="character_name" placeholder="극 1 · 찰리">
+            </div>
+            <div class="col-md-2">
               <label class="form-label small">배역명</label>
               <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
-                     name="character_name" placeholder="홍길동 역">
+                     name="character_role" placeholder="홍길동 역">
             </div>
             <div class="col-md-2">
               <label class="form-label small">배우명 *</label>
@@ -196,15 +201,30 @@
             <div class="col-md-1">
               <button type="submit" class="btn btn-gold btn-sm w-100">추가</button>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label class="form-label small">질문 1 답변</label>
               <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
                      name="q1" placeholder="{{ performance.q1_text or '질문 1 답변' }}">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label class="form-label small">질문 2 답변</label>
               <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
                      name="q2" placeholder="{{ performance.q2_text or '질문 2 답변' }}">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">학과</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="major" placeholder="경영학과">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">학번</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="student_id" placeholder="20학번">
+            </div>
+            <div class="col-md-12">
+              <label class="form-label small">이력</label>
+              <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                        name="history" rows="2" placeholder="제85회 연출&#10;제84회 조명팀"></textarea>
             </div>
           </div>
         </form>
@@ -228,7 +248,7 @@
               </div>
               {% endif %}
               <div class="flex-grow-1 min-w-0">
-                <div class="small" style="color:#c9a84c;">{{ c.character_name or '—' }}</div>
+                <div class="small" style="color:#c9a84c;">{{ c.character_role or c.character_name or '—' }}</div>
                 <div class="fw-semibold text-truncate">{{ c.actor_name }}</div>
                 {% if c.actor_bio %}<div class="small" style="color:#666;">{{ c.actor_bio }}</div>{% endif %}
                 {% if c.message %}<div class="small fst-italic" style="color:#888;">{{ c.message }}</div>{% endif %}
@@ -250,12 +270,17 @@
               <form method="POST" action="{{ url_for('admin_edit_cast', id=c.id) }}"
                     enctype="multipart/form-data">
                 <div class="row g-2">
-                  <div class="col-6">
+                  <div class="col-4">
                     <label class="form-label small">소속 극</label>
                     <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
                            name="character_name" value="{{ c.character_name or '' }}" placeholder="극 1 · 찰리">
                   </div>
-                  <div class="col-6">
+                  <div class="col-4">
+                    <label class="form-label small">배역명</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="character_role" value="{{ c.character_role or '' }}" placeholder="홍길동 역">
+                  </div>
+                  <div class="col-4">
                     <label class="form-label small">역할</label>
                     <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
                            name="actor_bio" value="{{ c.actor_bio or '' }}" placeholder="작·연출">
@@ -279,6 +304,21 @@
                     <label class="form-label small">질문 2 답변 <span style="color:#666;">({{ performance.q2_text or 'Q2' }})</span></label>
                     <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
                               name="q2" rows="2">{{ c.q2 or '' }}</textarea>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">학과</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="major" value="{{ c.major or '' }}" placeholder="경영학과">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">학번</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="student_id" value="{{ c.student_id or '' }}" placeholder="20학번">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">이력</label>
+                    <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                              name="history" rows="2" placeholder="제85회 연출&#10;제84회 조명팀">{{ c.history or '' }}</textarea>
                   </div>
                   <div class="col-12">
                     <label class="form-label small">사진 교체 (최대 3장, 선택 시 기존 사진 대체)</label>
@@ -329,6 +369,11 @@
                      name="department" placeholder="기획, 무대, 조명…">
             </div>
             <div class="col-md-2">
+              <label class="form-label small">직책</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="role" placeholder="기획장, 기획원…">
+            </div>
+            <div class="col-md-2">
               <label class="form-label small">이름 *</label>
               <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
                      name="name" placeholder="이름" required>
@@ -351,15 +396,30 @@
             <div class="col-md-1">
               <button type="submit" class="btn btn-gold btn-sm w-100">추가</button>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label class="form-label small">질문 1 답변</label>
               <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
                      name="q1" placeholder="{{ performance.q1_text or '질문 1 답변' }}">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label class="form-label small">질문 2 답변</label>
               <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
                      name="q2" placeholder="{{ performance.q2_text or '질문 2 답변' }}">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">학과</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="major" placeholder="경영학과">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small">학번</label>
+              <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                     name="student_id" placeholder="20학번">
+            </div>
+            <div class="col-md-12">
+              <label class="form-label small">이력</label>
+              <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                        name="history" rows="2" placeholder="제85회 연출&#10;제84회 조명팀"></textarea>
             </div>
           </div>
         </form>
@@ -414,12 +474,17 @@
                       {% endfor %}
                     </select>
                   </div>
-                  <div class="col-6">
+                  <div class="col-4">
                     <label class="form-label small">분야</label>
                     <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
                            name="department" value="{{ s.department or '' }}">
                   </div>
-                  <div class="col-6">
+                  <div class="col-4">
+                    <label class="form-label small">직책</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="role" value="{{ s.role or '' }}" placeholder="기획장, 기획원…">
+                  </div>
+                  <div class="col-4">
                     <label class="form-label small">이름 *</label>
                     <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
                            name="name" value="{{ s.name }}" required>
@@ -438,6 +503,21 @@
                     <label class="form-label small">질문 2 답변 <span style="color:#666;">({{ performance.q2_text or 'Q2' }})</span></label>
                     <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
                               name="q2" rows="2">{{ s.q2 or '' }}</textarea>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">학과</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="major" value="{{ s.major or '' }}" placeholder="경영학과">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">학번</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                           name="student_id" value="{{ s.student_id or '' }}" placeholder="20학번">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">이력</label>
+                    <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                              name="history" rows="2" placeholder="제85회 연출&#10;제84회 조명팀">{{ s.history or '' }}</textarea>
                   </div>
                   <div class="col-12">
                     <label class="form-label small">사진 교체 (최대 3장, 선택 시 기존 사진 대체)</label>

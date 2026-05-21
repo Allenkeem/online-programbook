@@ -102,6 +102,13 @@ def init_db():
         "ALTER TABLE staff_members ADD COLUMN q2 TEXT DEFAULT ''",
         "ALTER TABLE performances ADD COLUMN q1_text TEXT DEFAULT ''",
         "ALTER TABLE performances ADD COLUMN q2_text TEXT DEFAULT ''",
+        "ALTER TABLE cast_members ADD COLUMN character_role TEXT DEFAULT ''",
+        "ALTER TABLE cast_members ADD COLUMN major TEXT DEFAULT ''",
+        "ALTER TABLE cast_members ADD COLUMN student_id TEXT DEFAULT ''",
+        "ALTER TABLE cast_members ADD COLUMN history TEXT DEFAULT ''",
+        "ALTER TABLE staff_members ADD COLUMN major TEXT DEFAULT ''",
+        "ALTER TABLE staff_members ADD COLUMN student_id TEXT DEFAULT ''",
+        "ALTER TABLE staff_members ADD COLUMN history TEXT DEFAULT ''",
     ]:
         try:
             conn.execute(stmt)
@@ -181,12 +188,16 @@ def index():
             'cast': [
                 {
                     'character': c['character_name'] or '',
+                    'character_role': c['character_role'] or '',
                     'actor': c['actor_name'],
                     'bio': c['actor_bio'] or '',
                     'photos': [url_for('static', filename=f"uploads/{c[k]}") for k in ('actor_photo','actor_photo2','actor_photo3') if c[k]],
                     'message': c['message'] or '',
                     'q1': c['q1'] or '',
                     'q2': c['q2'] or '',
+                    'major': c['major'] or '',
+                    'student_id': c['student_id'] or '',
+                    'history': c['history'] or '',
                 }
                 for c in cast_rows
             ],
@@ -200,6 +211,9 @@ def index():
                     'message': s['message'] or '',
                     'q1': s['q1'] or '',
                     'q2': s['q2'] or '',
+                    'major': s['major'] or '',
+                    'student_id': s['student_id'] or '',
+                    'history': s['history'] or '',
                 }
                 for s in staff_rows
             ],
@@ -421,12 +435,14 @@ def admin_add_cast(perf_id):
     conn = get_db()
     conn.execute('''
         INSERT INTO cast_members
-          (performance_id, character_name, actor_name, actor_bio, actor_photo, actor_photo2, actor_photo3, message, q1, q2, sort_order)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?)
-    ''', (perf_id, request.form.get('character_name', ''), request.form['actor_name'],
-          request.form.get('actor_bio', ''), photo1, photo2, photo3,
+          (performance_id, character_name, character_role, actor_name, actor_bio, actor_photo, actor_photo2, actor_photo3, message, q1, q2, sort_order, major, student_id, history)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    ''', (perf_id, request.form.get('character_name', ''), request.form.get('character_role', ''),
+          request.form['actor_name'], request.form.get('actor_bio', ''), photo1, photo2, photo3,
           request.form.get('message', ''), request.form.get('q1', ''),
-          request.form.get('q2', ''), int(request.form.get('sort_order', 0) or 0)))
+          request.form.get('q2', ''), int(request.form.get('sort_order', 0) or 0),
+          request.form.get('major', ''), request.form.get('student_id', ''),
+          request.form.get('history', '')))
     conn.commit()
     conn.close()
     return redirect(url_for('admin_edit_performance', id=perf_id) + '#cast')
@@ -443,13 +459,16 @@ def admin_edit_cast(id):
     p2 = new_photos[1] if len(new_photos) > 1 else row['actor_photo2']
     p3 = new_photos[2] if len(new_photos) > 2 else row['actor_photo3']
     conn.execute('''
-        UPDATE cast_members SET character_name=?, actor_name=?, actor_bio=?,
-          message=?, q1=?, q2=?, actor_photo=?, actor_photo2=?, actor_photo3=?, sort_order=?
+        UPDATE cast_members SET character_name=?, character_role=?, actor_name=?, actor_bio=?,
+          message=?, q1=?, q2=?, actor_photo=?, actor_photo2=?, actor_photo3=?, sort_order=?,
+          major=?, student_id=?, history=?
         WHERE id=?
-    ''', (request.form.get('character_name', ''), request.form['actor_name'],
-          request.form.get('actor_bio', ''), request.form.get('message', ''),
-          request.form.get('q1', ''), request.form.get('q2', ''),
-          p1, p2, p3, int(request.form.get('sort_order', 0) or 0), id))
+    ''', (request.form.get('character_name', ''), request.form.get('character_role', ''),
+          request.form['actor_name'], request.form.get('actor_bio', ''),
+          request.form.get('message', ''), request.form.get('q1', ''), request.form.get('q2', ''),
+          p1, p2, p3, int(request.form.get('sort_order', 0) or 0),
+          request.form.get('major', ''), request.form.get('student_id', ''),
+          request.form.get('history', ''), id))
     conn.commit()
     conn.close()
     return redirect(url_for('admin_edit_performance', id=row['performance_id']) + '#cast')
@@ -476,12 +495,14 @@ def admin_add_staff(perf_id):
     photo3 = photos[2] if len(photos) > 2 else None
     conn = get_db()
     conn.execute('''
-        INSERT INTO staff_members (performance_id, department, role, name, play_name, photo, photo2, photo3, message, q1, q2, sort_order)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+        INSERT INTO staff_members (performance_id, department, role, name, play_name, photo, photo2, photo3, message, q1, q2, sort_order, major, student_id, history)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     ''', (perf_id, request.form.get('department', ''), request.form.get('role', ''),
           request.form['name'], request.form.get('play_name', ''), photo1, photo2, photo3,
           request.form.get('message', ''), request.form.get('q1', ''),
-          request.form.get('q2', ''), int(request.form.get('sort_order', 0) or 0)))
+          request.form.get('q2', ''), int(request.form.get('sort_order', 0) or 0),
+          request.form.get('major', ''), request.form.get('student_id', ''),
+          request.form.get('history', '')))
     conn.commit()
     conn.close()
     return redirect(url_for('admin_edit_performance', id=perf_id) + '#staff')
@@ -498,13 +519,17 @@ def admin_edit_staff(id):
     p2 = new_photos[1] if len(new_photos) > 1 else row['photo2']
     p3 = new_photos[2] if len(new_photos) > 2 else row['photo3']
     conn.execute('''
-        UPDATE staff_members SET department=?, name=?, play_name=?,
-          message=?, q1=?, q2=?, photo=?, photo2=?, photo3=?, sort_order=?
+        UPDATE staff_members SET department=?, role=?, name=?, play_name=?,
+          message=?, q1=?, q2=?, photo=?, photo2=?, photo3=?, sort_order=?,
+          major=?, student_id=?, history=?
         WHERE id=?
-    ''', (request.form.get('department', ''), request.form['name'],
-          request.form.get('play_name', ''), request.form.get('message', ''),
-          request.form.get('q1', ''), request.form.get('q2', ''),
-          p1, p2, p3, int(request.form.get('sort_order', 0) or 0), id))
+    ''', (request.form.get('department', ''), request.form.get('role', ''),
+          request.form['name'], request.form.get('play_name', ''),
+          request.form.get('message', ''), request.form.get('q1', ''),
+          request.form.get('q2', ''),
+          p1, p2, p3, int(request.form.get('sort_order', 0) or 0),
+          request.form.get('major', ''), request.form.get('student_id', ''),
+          request.form.get('history', ''), id))
     conn.commit()
     conn.close()
     return redirect(url_for('admin_edit_performance', id=row['performance_id']) + '#staff')
