@@ -228,7 +228,13 @@ function renderDetail(perf) {
                 </div>
             </div>
         </div>
-        <nav class="detail-toc"><div class="detail-toc-inner">${tocLinks}</div></nav>
+    </div>
+    <nav class="detail-toc"><div class="detail-toc-inner">${tocLinks}</div></nav>`;
+
+    // ── 프로그램북 인사 문구
+    html += `<div class="detail-intro">
+        <p>서강연극회는 공연에 대한 다양한 정보를 많은 관객분들과 나누고자 프로그램북을 온라인으로 제공하고 있습니다.</p>
+        <p>본 프로그램북이 연극과 더욱 가까워지는 계기가 될 수 있었으면 합니다.<br>서강연극회는 앞으로도 더욱 좋은 공연으로 찾아오겠습니다. 감사합니다.</p>
     </div>`;
 
     // ── 포스터
@@ -269,7 +275,7 @@ function renderDetail(perf) {
                     : `<div class="cast-photo-placeholder">☺</div>`;
                 return `<div class="cast-card cast-card-nav" onclick="showTeam('${safeAttr(play.name)}')">
                     <div class="cast-photo">${photo}</div>
-                    <span class="cast-character">${esc(c.bio || '')}</span>
+                    ${c.character_role ? `<span class="cast-character">${esc(c.character_role)}</span>` : (c.bio ? `<span class="cast-character">${esc(c.bio)}</span>` : '')}
                     <span class="cast-actor">${esc(c.actor)}</span>
                 </div>`;
             }).join('');
@@ -286,7 +292,15 @@ function renderDetail(perf) {
 
     // ── 스태프 (부서별 얼굴 → 부서 페이지)
     if (generalStaff.length > 0) {
-        const depts = [...new Set(generalStaff.map(s => s.department).filter(Boolean))];
+        const DEPT_ORDER = ['기획', '기획팀', '디자인', '디자인팀', '연출', '연출팀', '무대', '무대팀', '조명', '조명팀', '음향', '음향팀', '의상', '의상팀', '분장', '분장팀', '소품', '소품팀', '의상소품분장'];
+        const rawDepts = [...new Set(generalStaff.map(s => s.department).filter(Boolean))];
+        const depts = rawDepts.sort((a, b) => {
+            const ai = DEPT_ORDER.indexOf(a), bi = DEPT_ORDER.indexOf(b);
+            if (ai === -1 && bi === -1) return 0;
+            if (ai === -1) return 1;
+            if (bi === -1) return -1;
+            return ai - bi;
+        });
         const groups = depts.map(dept => {
             const members = generalStaff.filter(s => s.department === dept);
             const faceCards = members.map(s => {
@@ -322,8 +336,46 @@ function renderDetail(perf) {
         currentGallery = [];
     }
 
+    html += renderHistory();
+
     el.innerHTML = html;
     initCarousels(el);
+}
+
+function renderHistory() {
+    const TYPE_LABEL = { 정기:'정기', 워크샵:'워크샵', 임시:'임시', 신입:'신입', 소공연:'소공연', 스터디:'스터디', 축제:'축제', 지방:'지방', 비정기:'비정기' };
+    const TYPE_CLASS = { 정기:'hist-badge-regular', 워크샵:'hist-badge-workshop', 임시:'hist-badge-etc', 신입:'hist-badge-etc', 소공연:'hist-badge-etc', 스터디:'hist-badge-etc', 축제:'hist-badge-etc', 지방:'hist-badge-etc', 비정기:'hist-badge-etc' };
+
+    const tabs = SG_HISTORY.map((d, i) =>
+        `<button class="hist-tab${i === SG_HISTORY.length - 1 ? ' active' : ''}" data-decade="${d.decade}">${d.decade}</button>`
+    ).join('');
+
+    const panels = SG_HISTORY.map((d, i) => {
+        const rows = d.entries.map(e => {
+            const badge = `<span class="hist-badge ${TYPE_CLASS[e.type] || 'hist-badge-etc'}">${e.num || TYPE_LABEL[e.type] || e.type}</span>`;
+            const meta = [e.year, e.season].filter(Boolean).join(' · ');
+            const producer = e.producer ? `<span class="hist-producer">${esc(e.producer)} 기획</span>` : '';
+            const subtitle = e.subtitle ? `<span class="hist-subtitle">〈${esc(e.subtitle)}〉</span>` : '';
+            const note = e.note ? `<span class="hist-note">${esc(e.note)}</span>` : '';
+            const plays = e.plays.map(p =>
+                `<div class="hist-play"><span class="hist-play-title">${esc(p.title)}</span>${p.credits ? `<span class="hist-play-credits">${esc(p.credits)}</span>` : ''}</div>`
+            ).join('');
+            return `<div class="hist-entry">
+                <div class="hist-entry-head">${badge}${meta ? `<span class="hist-meta">${esc(meta)}</span>` : ''}${note}</div>
+                <div class="hist-entry-body">${producer}${subtitle}${plays}</div>
+            </div>`;
+        }).join('');
+        return `<div class="hist-panel${i === SG_HISTORY.length - 1 ? ' active' : ''}" data-decade="${d.decade}">${rows}</div>`;
+    }).join('');
+
+    return `<section class="detail-section section-dark hist-section" id="sec-연보">
+        <div class="section-inner">
+            <span class="section-label">공연 연보</span>
+            <div class="hist-tabs">${tabs}</div>
+            <div class="hist-panels">${panels}</div>
+            <p class="hist-closing">1960년부터, 지금 여기 — 서강연극회는 무대 위에 있습니다.</p>
+        </div>
+    </section>`;
 }
 
 // ── Play Team Detail ──────────────────────────────────────────────────────────
@@ -357,8 +409,9 @@ function renderTeam(perf, teamName) {
 
     if (cast.length > 0) {
         const cards = cast.map(c => personCard({
-            photos: c.photos, role: c.bio, name: c.actor,
-            message: c.message, q1: c.q1, q2: c.q2
+            photos: c.photos, character_role: c.character_role, role: c.bio, name: c.actor,
+            message: c.message, q1: c.q1, q2: c.q2,
+            major: c.major, student_id: c.student_id, history: c.history
         })).join('');
         html += section('출연진', `<div class="cast-grid">${cards}</div>`);
     }
@@ -366,7 +419,8 @@ function renderTeam(perf, teamName) {
     if (staff.length > 0) {
         const cards = staff.map(s => personCard({
             photos: s.photos, role: s.role || s.department, name: s.name,
-            message: s.message, q1: s.q1, q2: s.q2
+            message: s.message, q1: s.q1, q2: s.q2,
+            major: s.major, student_id: s.student_id, history: s.history
         })).join('');
         html += section('스태프', `<div class="cast-grid">${cards}</div>`);
     }
@@ -396,7 +450,8 @@ function renderStaffDept(perf, deptName) {
     if (staff.length > 0) {
         const cards = staff.map(s => personCard({
             photos: s.photos, role: s.role || null, name: s.name,
-            message: s.message, q1: s.q1, q2: s.q2
+            message: s.message, q1: s.q1, q2: s.q2,
+            major: s.major, student_id: s.student_id, history: s.history
         })).join('');
         html += `<section class="detail-section">
             <div class="section-inner">
@@ -411,7 +466,7 @@ function renderStaffDept(perf, deptName) {
 
 // ── Person card ───────────────────────────────────────────────────────────────
 function personCard(member) {
-    const { photos, role, name, message, q1, q2 } = member;
+    const { photos, character_role, role, name, message, q1, q2 } = member;
     const imgs = (Array.isArray(photos) ? photos : [photos]).filter(Boolean);
     // Single-quoted HTML attr: only &#39; needs escaping (&#39; decodes to ' via dataset API)
     const mj = JSON.stringify(member).replace(/'/g, '&#39;');
@@ -439,7 +494,7 @@ function personCard(member) {
     }
     return `<div class="cast-card">
         ${photoBlock}
-        ${role ? `<span class="cast-character">${esc(role)}</span>` : ''}
+        ${character_role ? `<span class="cast-character">${esc(character_role)}</span>` : (role ? `<span class="cast-character">${esc(role)}</span>` : '')}
         <span class="cast-actor">${esc(name)}</span>
         ${message ? `<span class="cast-message">${esc(message)}</span>` : ''}
     </div>`;
@@ -456,6 +511,16 @@ function initProfileTriggers(root) {
         });
     });
 }
+
+// ── History tab switching ─────────────────────────────────────────────────────
+document.addEventListener('click', e => {
+    const tab = e.target.closest('.hist-tab');
+    if (!tab) return;
+    const decade = tab.dataset.decade;
+    const section = tab.closest('.hist-section');
+    section.querySelectorAll('.hist-tab').forEach(t => t.classList.toggle('active', t.dataset.decade === decade));
+    section.querySelectorAll('.hist-panel').forEach(p => p.classList.toggle('active', p.dataset.decade === decade));
+});
 
 // ── Carousel init ─────────────────────────────────────────────────────────────
 function initCarousels(root) {
@@ -569,8 +634,15 @@ function openPersonProfile(member) {
     }
 
     // Text info
-    document.getElementById('profile-role').textContent = member.role || '';
+    document.getElementById('profile-role').textContent = member.character_role || member.role || '';
     document.getElementById('profile-name').textContent = member.name || '';
+    const metaParts = [member.major, member.student_id].filter(Boolean);
+    const metaEl = document.getElementById('profile-meta');
+    if (metaParts.length > 0) { metaEl.textContent = metaParts.join(' · '); metaEl.style.display = ''; }
+    else { metaEl.style.display = 'none'; }
+    const histEl = document.getElementById('profile-history');
+    if (member.history) { histEl.textContent = member.history; histEl.style.display = ''; }
+    else { histEl.style.display = 'none'; }
     const msgEl = document.getElementById('profile-message');
     if (member.message) { msgEl.textContent = member.message; msgEl.style.display = ''; }
     else { msgEl.style.display = 'none'; }

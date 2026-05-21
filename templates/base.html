@@ -18,6 +18,7 @@
     {% for msg in messages %}<div class="toast info">{{ msg }}</div>{% endfor %}
   </div>
   {% endif %}{% endwith %}
+  <script src="{{ url_for('static', filename='js/history-data.js') }}"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>
