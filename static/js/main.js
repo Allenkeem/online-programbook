@@ -456,9 +456,10 @@ function renderStaffDept(perf, deptName) {
             message: s.message, q1: s.q1, q2: s.q2,
             major: s.major, student_id: s.student_id, history: s.history
         })).join('');
+        const hint = `<p style="font-size:0.72rem;color:var(--text-muted);margin-bottom:1.2rem;opacity:0.6;">사진을 탭하면 상세 정보를 볼 수 있어요</p>`;
         html += `<section class="detail-section">
             <div class="section-inner">
-                <div class="cast-grid">${cards}</div>
+                ${hint}<div class="cast-grid">${cards}</div>
             </div>
         </section>`;
     }
