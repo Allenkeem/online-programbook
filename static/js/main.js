@@ -499,8 +499,12 @@ function personCard(member, showIntro = false) {
         ${photoBlock}
         ${character_role ? `<span class="cast-character">${esc(character_role)}</span>` : (role ? `<span class="cast-character">${esc(role)}</span>` : '')}
         <span class="cast-actor">${esc(name)}</span>
-        ${character_intro ? `<p class="cast-character-intro">${esc(character_intro)}</p>` : ''}
-        ${showIntro && introText ? `<p class="cast-intro-text">${esc(introText)}</p>` : (message ? `<span class="cast-message">${esc(message)}</span>` : '')}
+        ${showIntro
+            ? `${character_intro ? `<p class="cast-character-intro">${esc(character_intro)}</p>` : ''}
+               ${introText ? `<p class="cast-intro-text">${esc(introText)}</p>` : ''}`
+            : `${message ? `<span class="cast-message">${esc(message)}</span>` : ''}
+               ${actor_intro ? `<p class="cast-intro-text">${esc(actor_intro)}</p>` : ''}`
+        }
     </div>`;
 }
 
@@ -647,14 +651,26 @@ function openPersonProfile(member) {
     const histEl = document.getElementById('profile-history');
     if (member.history) { histEl.textContent = member.history; histEl.style.display = ''; }
     else { histEl.style.display = 'none'; }
-    const introEl = document.getElementById('profile-intro');
-    const introText = member.actor_intro || (!member.actor_intro && member.message ? member.message : '');
-    if (introText) { introEl.textContent = introText; introEl.style.display = ''; }
-    else { introEl.style.display = 'none'; }
-    // 대사는 actor_intro가 별도로 있을 때만 모달에도 표시
+    // 대사 (actor_intro 있을 때만 표시)
     const msgEl = document.getElementById('profile-message');
     if (member.actor_intro && member.message) { msgEl.textContent = member.message; msgEl.style.display = ''; }
     else { msgEl.style.display = 'none'; }
+
+    // 소개 (actor_intro 우선, 없으면 message)
+    const introEl = document.getElementById('profile-intro');
+    const introText = member.actor_intro || member.message || '';
+    if (introText) { introEl.textContent = introText; introEl.style.display = ''; }
+    else { introEl.style.display = 'none'; }
+
+    // 배역 소개
+    const charIntroBlock = document.getElementById('profile-character-intro-block');
+    const charIntroText = document.getElementById('profile-character-intro-text');
+    if (member.character_intro) {
+        charIntroText.textContent = member.character_intro;
+        charIntroBlock.style.display = '';
+    } else {
+        charIntroBlock.style.display = 'none';
+    }
 
     // Q&A
     const qaEl = document.getElementById('profile-qa');
