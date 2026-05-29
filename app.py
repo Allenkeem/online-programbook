@@ -126,13 +126,26 @@ def allowed_file(filename):
             filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS)
 
 
-def save_upload(file, prefix='img'):
-    if file and file.filename and allowed_file(file.filename):
+def save_upload(file, prefix='img', max_size=1200, quality=85):
+    if not (file and file.filename and allowed_file(file.filename)):
+        return None
+    try:
+        from PIL import Image
+        import io
+        img = Image.open(file.stream)
+        if img.mode in ('RGBA', 'P', 'LA'):
+            img = img.convert('RGB')
+        img.thumbnail((max_size, max_size), Image.LANCZOS)
+        filename = secure_filename(f"{prefix}_{int(time.time() * 1000)}.jpg")
+        img.save(os.path.join(UPLOAD_FOLDER, filename), 'JPEG', quality=quality, optimize=True)
+        return filename
+    except Exception:
+        # Pillow 없거나 변환 실패 시 원본 저장
+        file.stream.seek(0)
         ext = file.filename.rsplit('.', 1)[1].lower()
         filename = secure_filename(f"{prefix}_{int(time.time() * 1000)}.{ext}")
         file.save(os.path.join(UPLOAD_FOLDER, filename))
         return filename
-    return None
 
 
 def login_required(f):
