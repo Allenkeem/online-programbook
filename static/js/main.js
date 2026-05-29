@@ -468,25 +468,26 @@ function renderStaffDept(perf, deptName) {
 
 // ── Person card ───────────────────────────────────────────────────────────────
 function personCard(member, showIntro = false) {
-    const { photos, character_role, role, name, message, q1, q2, character_intro, actor_intro } = member;
+    const { photos, thumbs, character_role, role, name, message, q1, q2, character_intro, actor_intro } = member;
     const introText = actor_intro || message || '';
     const imgs = (Array.isArray(photos) ? photos : [photos]).filter(Boolean);
+    const thmbs = (Array.isArray(thumbs) && thumbs.length) ? thumbs.filter(Boolean) : imgs;
     // Single-quoted HTML attr: only &#39; needs escaping (&#39; decodes to ' via dataset API)
     const mj = JSON.stringify(member).replace(/'/g, '&#39;');
     let photoBlock;
-    if (imgs.length === 0) {
+    if (thmbs.length === 0) {
         photoBlock = `<div class="cast-photo cast-photo-zoom profile-trigger" data-member='${mj}'>
             <div class="cast-photo-placeholder">☺</div>
         </div>`;
-    } else if (imgs.length === 1) {
+    } else if (thmbs.length === 1) {
         photoBlock = `<div class="cast-photo cast-photo-zoom profile-trigger" data-member='${mj}'>
-            <img src="${esc(imgs[0])}" alt="${esc(name)}" loading="lazy">
+            <img src="${esc(thmbs[0])}" alt="${esc(name)}" loading="lazy">
         </div>`;
     } else {
-        const slides = imgs.map((src, i) =>
+        const slides = thmbs.map((src, i) =>
             `<div class="cast-slide${i === 0 ? ' active' : ''}"><img src="${esc(src)}" alt="${esc(name)}" loading="lazy"></div>`
         ).join('');
-        const dots = imgs.map((_, i) =>
+        const dots = thmbs.map((_, i) =>
             `<span class="carousel-dot${i === 0 ? ' active' : ''}"></span>`
         ).join('');
         photoBlock = `<div class="cast-photo carousel cast-photo-zoom" data-member='${mj}'>
