@@ -647,10 +647,12 @@ function openPersonProfile(member) {
     if (member.history) { histEl.textContent = member.history; histEl.style.display = ''; }
     else { histEl.style.display = 'none'; }
     const introEl = document.getElementById('profile-intro');
-    if (member.actor_intro) { introEl.textContent = member.actor_intro; introEl.style.display = ''; }
+    const introText = member.actor_intro || (!member.actor_intro && member.message ? member.message : '');
+    if (introText) { introEl.textContent = introText; introEl.style.display = ''; }
     else { introEl.style.display = 'none'; }
+    // 대사는 actor_intro가 별도로 있을 때만 모달에도 표시
     const msgEl = document.getElementById('profile-message');
-    if (member.message) { msgEl.textContent = member.message; msgEl.style.display = ''; }
+    if (member.actor_intro && member.message) { msgEl.textContent = member.message; msgEl.style.display = ''; }
     else { msgEl.style.display = 'none'; }
 
     // Q&A
