@@ -499,12 +499,8 @@ function personCard(member, showIntro = false) {
         ${photoBlock}
         ${character_role ? `<span class="cast-character">${esc(character_role)}</span>` : (role ? `<span class="cast-character">${esc(role)}</span>` : '')}
         <span class="cast-actor">${esc(name)}</span>
-        ${showIntro
-            ? `${character_intro ? `<p class="cast-character-intro">${esc(character_intro)}</p>` : ''}
-               ${introText ? `<p class="cast-intro-text">${esc(introText)}</p>` : ''}`
-            : `${message ? `<span class="cast-message">${esc(message)}</span>` : ''}
-               ${actor_intro ? `<p class="cast-intro-text">${esc(actor_intro)}</p>` : ''}`
-        }
+        ${message ? `<span class="cast-message">${esc(message)}</span>` : ''}
+        ${actor_intro ? `<p class="cast-intro-text">${esc(actor_intro)}</p>` : ''}
     </div>`;
 }
 
