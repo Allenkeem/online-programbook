@@ -468,7 +468,7 @@ function renderStaffDept(perf, deptName) {
 
 // ── Person card ───────────────────────────────────────────────────────────────
 function personCard(member) {
-    const { photos, character_role, role, name, message, q1, q2, character_intro } = member;
+    const { photos, character_role, role, name, message, q1, q2, character_intro, actor_intro } = member;
     const imgs = (Array.isArray(photos) ? photos : [photos]).filter(Boolean);
     // Single-quoted HTML attr: only &#39; needs escaping (&#39; decodes to ' via dataset API)
     const mj = JSON.stringify(member).replace(/'/g, '&#39;');
@@ -646,6 +646,9 @@ function openPersonProfile(member) {
     const histEl = document.getElementById('profile-history');
     if (member.history) { histEl.textContent = member.history; histEl.style.display = ''; }
     else { histEl.style.display = 'none'; }
+    const introEl = document.getElementById('profile-intro');
+    if (member.actor_intro) { introEl.textContent = member.actor_intro; introEl.style.display = ''; }
+    else { introEl.style.display = 'none'; }
     const msgEl = document.getElementById('profile-message');
     if (member.message) { msgEl.textContent = member.message; msgEl.style.display = ''; }
     else { msgEl.style.display = 'none'; }

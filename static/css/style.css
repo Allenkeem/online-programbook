@@ -1173,6 +1173,15 @@ button { font-family: inherit; }
     white-space: pre-line;
 }
 
+.profile-intro {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin: 0.25rem 0 0.5rem;
+    word-break: keep-all;
+    white-space: pre-line;
+}
+
 .profile-message {
     font-size: 0.85rem;
     color: var(--text-muted);
