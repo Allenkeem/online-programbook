@@ -767,6 +767,33 @@ button { font-family: inherit; }
     word-break: keep-all;
 }
 
+.cast-character-intro {
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-top: 0.35rem;
+    padding: 0 0.25rem;
+    text-align: center;
+    word-break: keep-all;
+}
+
+.cast-intro-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+    margin-top: 0.4rem;
+    word-break: keep-all;
+    white-space: pre-line;
+}
+
 /* =====================================================
    STAFF GRID
    ===================================================== */
