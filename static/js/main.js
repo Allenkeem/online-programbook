@@ -413,8 +413,8 @@ function renderTeam(perf, teamName) {
             photos: c.photos, character_role: c.character_role, role: c.bio, name: c.actor,
             message: c.message, q1: c.q1, q2: c.q2,
             major: c.major, student_id: c.student_id, history: c.history,
-            character_intro: c.character_intro
-        })).join('');
+            character_intro: c.character_intro, actor_intro: c.actor_intro
+        }, true)).join('');
         html += section('출연진', `<div class="cast-grid">${cards}</div>`);
     }
 
@@ -467,8 +467,9 @@ function renderStaffDept(perf, deptName) {
 }
 
 // ── Person card ───────────────────────────────────────────────────────────────
-function personCard(member) {
+function personCard(member, showIntro = false) {
     const { photos, character_role, role, name, message, q1, q2, character_intro, actor_intro } = member;
+    const introText = actor_intro || message || '';
     const imgs = (Array.isArray(photos) ? photos : [photos]).filter(Boolean);
     // Single-quoted HTML attr: only &#39; needs escaping (&#39; decodes to ' via dataset API)
     const mj = JSON.stringify(member).replace(/'/g, '&#39;');
@@ -498,8 +499,8 @@ function personCard(member) {
         ${photoBlock}
         ${character_role ? `<span class="cast-character">${esc(character_role)}</span>` : (role ? `<span class="cast-character">${esc(role)}</span>` : '')}
         <span class="cast-actor">${esc(name)}</span>
-        ${character_intro ? `<p style="font-size:0.72rem;color:var(--text-muted);line-height:1.6;margin-top:0.35rem;padding:0 0.25rem;text-align:center;">${esc(character_intro)}</p>` : ''}
-        ${message ? `<span class="cast-message">${esc(message)}</span>` : ''}
+        ${character_intro ? `<p class="cast-character-intro">${esc(character_intro)}</p>` : ''}
+        ${showIntro && introText ? `<p class="cast-intro-text">${esc(introText)}</p>` : (message ? `<span class="cast-message">${esc(message)}</span>` : '')}
     </div>`;
 }
 
