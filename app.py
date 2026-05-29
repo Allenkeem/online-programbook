@@ -111,6 +111,7 @@ def init_db():
         "ALTER TABLE staff_members ADD COLUMN history TEXT DEFAULT ''",
         "ALTER TABLE plays ADD COLUMN director_note TEXT DEFAULT ''",
         "ALTER TABLE cast_members ADD COLUMN character_intro TEXT DEFAULT ''",
+        "ALTER TABLE cast_members ADD COLUMN actor_intro TEXT DEFAULT ''",
     ]:
         try:
             conn.execute(stmt)
@@ -201,6 +202,7 @@ def index():
                     'student_id': c['student_id'] or '',
                     'history': c['history'] or '',
                     'character_intro': c['character_intro'] or '',
+                    'actor_intro': c['actor_intro'] or '',
                 }
                 for c in cast_rows
             ],
@@ -438,14 +440,15 @@ def admin_add_cast(perf_id):
     conn = get_db()
     conn.execute('''
         INSERT INTO cast_members
-          (performance_id, character_name, character_role, actor_name, actor_bio, actor_photo, actor_photo2, actor_photo3, message, q1, q2, sort_order, major, student_id, history, character_intro)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+          (performance_id, character_name, character_role, actor_name, actor_bio, actor_photo, actor_photo2, actor_photo3, message, q1, q2, sort_order, major, student_id, history, character_intro, actor_intro)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     ''', (perf_id, request.form.get('character_name', ''), request.form.get('character_role', ''),
           request.form['actor_name'], request.form.get('actor_bio', ''), photo1, photo2, photo3,
           request.form.get('message', ''), request.form.get('q1', ''),
           request.form.get('q2', ''), int(request.form.get('sort_order', 0) or 0),
           request.form.get('major', ''), request.form.get('student_id', ''),
-          request.form.get('history', ''), request.form.get('character_intro', '')))
+          request.form.get('history', ''), request.form.get('character_intro', ''),
+          request.form.get('actor_intro', '')))
     conn.commit()
     conn.close()
     return redirect(url_for('admin_edit_performance', id=perf_id) + '#cast')
@@ -464,14 +467,15 @@ def admin_edit_cast(id):
     conn.execute('''
         UPDATE cast_members SET character_name=?, character_role=?, actor_name=?, actor_bio=?,
           message=?, q1=?, q2=?, actor_photo=?, actor_photo2=?, actor_photo3=?, sort_order=?,
-          major=?, student_id=?, history=?, character_intro=?
+          major=?, student_id=?, history=?, character_intro=?, actor_intro=?
         WHERE id=?
     ''', (request.form.get('character_name', ''), request.form.get('character_role', ''),
           request.form['actor_name'], request.form.get('actor_bio', ''),
           request.form.get('message', ''), request.form.get('q1', ''), request.form.get('q2', ''),
           p1, p2, p3, int(request.form.get('sort_order', 0) or 0),
           request.form.get('major', ''), request.form.get('student_id', ''),
-          request.form.get('history', ''), request.form.get('character_intro', ''), id))
+          request.form.get('history', ''), request.form.get('character_intro', ''),
+          request.form.get('actor_intro', ''), id))
     conn.commit()
     conn.close()
     return redirect(url_for('admin_edit_performance', id=row['performance_id']) + '#cast')

@@ -184,9 +184,9 @@
                      name="actor_bio" placeholder="작·연출">
             </div>
             <div class="col-md-2">
-              <label class="form-label small">한줄 메시지</label>
+              <label class="form-label small">대사 (카드 미리보기)</label>
               <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
-                     name="message" placeholder="개인 한마디">
+                     name="message" placeholder="극 중 대사나 짧은 한마디">
             </div>
             <div class="col-md-2">
               <label class="form-label small">사진 (최대 3장)</label>
@@ -296,9 +296,14 @@
                            name="actor_name" value="{{ c.actor_name }}" required>
                   </div>
                   <div class="col-12">
-                    <label class="form-label small">한줄 메시지</label>
+                    <label class="form-label small">대사 (카드 미리보기)</label>
                     <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
-                           name="message" value="{{ c.message or '' }}" placeholder="개인 한마디">
+                           name="message" value="{{ c.message or '' }}" placeholder="극 중 대사나 짧은 한마디">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">소개 (프로필 상세)</label>
+                    <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                              name="actor_intro" rows="2" placeholder="배우 개인 소개글">{{ c.actor_intro or '' }}</textarea>
                   </div>
                   <div class="col-12">
                     <label class="form-label small">질문 1 답변 <span style="color:#666;">({{ performance.q1_text or 'Q1' }})</span></label>
