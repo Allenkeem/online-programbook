@@ -200,6 +200,7 @@ def index():
                     'major': c['major'] or '',
                     'student_id': c['student_id'] or '',
                     'history': c['history'] or '',
+                    'character_intro': c['character_intro'] or '',
                 }
                 for c in cast_rows
             ],
@@ -224,7 +225,7 @@ def index():
                 for p in photo_rows
             ],
             'plays': [
-                {'name': p['name'], 'description': p['description'] or ''}
+                {'name': p['name'], 'description': p['description'] or '', 'director_note': p['director_note'] or ''}
                 for p in play_rows
             ],
             'departments': [
