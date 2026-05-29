@@ -502,8 +502,7 @@ function personCard(member, showIntro = false) {
         ${showIntro
             ? `${character_intro ? `<p class="cast-character-intro">${esc(character_intro)}</p>` : ''}
                ${introText ? `<p class="cast-intro-text">${esc(introText)}</p>` : ''}`
-            : `${message ? `<span class="cast-message">${esc(message)}</span>` : ''}
-               ${actor_intro ? `<p class="cast-intro-text">${esc(actor_intro)}</p>` : ''}`
+            : `${actor_intro ? `<p class="cast-intro-text">${esc(actor_intro)}</p>` : ''}`
         }
     </div>`;
 }
