@@ -640,12 +640,33 @@ button { font-family: inherit; }
     background: var(--bg-elevated);
     border: none;
     box-shadow: 0 3px 16px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
 .cast-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.cast-photo-zoom::after {
+    content: '＋';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: white;
+    background: rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: opacity 0.18s;
+    border-radius: 50%;
+}
+
+.cast-photo-zoom:hover::after,
+.cast-photo-zoom:active::after {
+    opacity: 1;
 }
 
 /* carousel */
@@ -1273,8 +1294,17 @@ button { font-family: inherit; }
     .section-inner { padding: 3rem 1.2rem; }
 
     .cast-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 1.2rem 0.8rem;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 1.4rem 0.6rem;
+    }
+
+    .cast-actor {
+        font-size: 0.85rem;
+        word-break: keep-all;
+    }
+
+    .cast-character {
+        font-size: 0.65rem;
     }
 
     .gallery-grid { grid-template-columns: repeat(2, 1fr); }

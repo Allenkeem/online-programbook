@@ -410,12 +410,13 @@ function renderTeam(perf, teamName) {
 
     if (cast.length > 0) {
         const cards = cast.map(c => personCard({
-            photos: c.photos, character_role: c.character_role, role: c.bio, name: c.actor,
+            photos: c.photos, thumbs: c.thumbs, character_role: c.character_role, role: c.bio, name: c.actor,
             message: c.message, q1: c.q1, q2: c.q2,
             major: c.major, student_id: c.student_id, history: c.history,
             character_intro: c.character_intro, actor_intro: c.actor_intro
         }, true)).join('');
-        html += section('출연진', `<div class="cast-grid">${cards}</div>`);
+        const hint = `<p style="font-size:0.72rem;color:var(--text-muted);margin-bottom:1.2rem;opacity:0.6;">사진을 탭하면 상세 정보를 볼 수 있어요</p>`;
+        html += section('출연진', hint + `<div class="cast-grid">${cards}</div>`);
     }
 
     if (staff.length > 0) {
