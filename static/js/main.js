@@ -400,13 +400,10 @@ function renderTeam(perf, teamName) {
     const cast  = (perf.cast  || []).filter(c => c.character === teamName);
     const staff = (perf.staff || []).filter(s => s.play_name  === teamName);
 
-    if (play && (play.description || play.director_note)) {
+    if (play && play.director_note) {
         html += `<div class="detail-section"><div class="section-inner">
-            ${play.description ? `<p class="synopsis-text" style="font-style:italic;">${esc(play.description)}</p>` : ''}
-            ${play.director_note ? `<div style="margin-top:1rem;padding:0.8rem 1rem;background:rgba(232,184,75,0.05);border-radius:8px;border-left:3px solid var(--primary);">
-                <span style="font-size:0.72rem;font-weight:700;color:var(--primary);letter-spacing:0.05em;display:block;margin-bottom:0.4rem;">연출의 말</span>
-                <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.8;margin:0;">${esc(play.director_note)}</p>
-            </div>` : ''}
+            <p class="section-label">연출의 말</p>
+            <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.9;margin:0;">${esc(play.director_note)}</p>
         </div></div>`;
         secIdx++;
     }
