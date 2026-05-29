@@ -74,13 +74,19 @@
     <div class="section-inner">
       <p class="section-label">출연진</p>
       {% for play_name, members in cast_by_play.items() %}
+      {% set play_info = plays_by_name.get(play_name, {}) %}
       <div style="margin-bottom:2.5rem;">
         {% if play_name %}
         <h3 style="font-size:0.95rem;font-weight:700;color:var(--primary);margin-bottom:0.6rem;letter-spacing:-0.2px;">{{ play_name }}</h3>
         {% endif %}
-        {% set desc = plays_by_name.get(play_name, '') %}
-        {% if desc %}
-        <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.75;margin-bottom:1.2rem;font-style:italic;padding-left:0.1rem;border-left:2px solid rgba(232,184,75,0.3);padding-left:0.8rem;">{{ desc }}</p>
+        {% if play_info.get('description') %}
+        <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.75;margin-bottom:0.8rem;font-style:italic;border-left:2px solid rgba(232,184,75,0.3);padding-left:0.8rem;">{{ play_info.description }}</p>
+        {% endif %}
+        {% if play_info.get('director_note') %}
+        <div style="font-size:0.88rem;color:var(--text-muted);line-height:1.8;margin-bottom:1.2rem;padding:0.8rem 1rem;background:rgba(232,184,75,0.05);border-radius:8px;border-left:3px solid var(--primary);">
+          <span style="font-size:0.72rem;font-weight:700;color:var(--primary);letter-spacing:0.05em;display:block;margin-bottom:0.4rem;">연출의도</span>
+          {{ play_info.director_note }}
+        </div>
         {% endif %}
         <div class="cast-grid">
           {% for member in members %}
@@ -96,6 +102,9 @@
             <span class="cast-character">{{ member.actor_bio }}</span>
             {% endif %}
             <span class="cast-actor">{{ member.actor_name }}</span>
+            {% if member.character_intro %}
+            <p style="font-size:0.72rem;color:var(--text-muted);line-height:1.6;margin-top:0.35rem;padding:0 0.25rem;">{{ member.character_intro }}</p>
+            {% endif %}
           </div>
           {% endfor %}
         </div>

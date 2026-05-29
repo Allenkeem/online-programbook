@@ -226,6 +226,11 @@
               <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
                         name="history" rows="2" placeholder="제85회 연출&#10;제84회 조명팀"></textarea>
             </div>
+            <div class="col-md-12">
+              <label class="form-label small">배역 소개</label>
+              <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                        name="character_intro" rows="2" placeholder="이 배역에 대한 소개를 입력하세요."></textarea>
+            </div>
           </div>
         </form>
       </div>
@@ -319,6 +324,11 @@
                     <label class="form-label small">이력</label>
                     <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
                               name="history" rows="2" placeholder="제85회 연출&#10;제84회 조명팀">{{ c.history or '' }}</textarea>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small">배역 소개</label>
+                    <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                              name="character_intro" rows="2" placeholder="이 배역에 대한 소개를 입력하세요.">{{ c.character_intro or '' }}</textarea>
                   </div>
                   <div class="col-12">
                     <label class="form-label small">사진 교체 (최대 3장, 선택 시 기존 사진 대체)</label>
@@ -620,6 +630,11 @@
             <div class="col-md-2">
               <button type="submit" class="btn btn-gold btn-sm w-100">추가</button>
             </div>
+            <div class="col-md-12">
+              <label class="form-label small">연출의도</label>
+              <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                        name="director_note" rows="3" placeholder="연출의도를 입력하세요."></textarea>
+            </div>
           </div>
         </form>
       </div>
@@ -635,10 +650,15 @@
                 <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
                        name="name" value="{{ play.name }}" required>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-5">
                 <label class="form-label small">방향성 / 한줄평</label>
                 <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
                           name="description" rows="2">{{ play.description }}</textarea>
+              </div>
+              <div class="col-md-5">
+                <label class="form-label small">연출의도</label>
+                <textarea class="form-control form-control-sm bg-dark text-light border-secondary"
+                          name="director_note" rows="2">{{ play.director_note or '' }}</textarea>
               </div>
               <div class="col-md-1">
                 <label class="form-label small">순서</label>
