@@ -1296,6 +1296,14 @@ button { font-family: inherit; }
         padding: 3.5rem 1.2rem 3rem;
     }
 
+    .detail-info-grid {
+        align-items: flex-start;
+    }
+
+    .detail-info-item {
+        justify-content: flex-start;
+    }
+
 
     .section-inner { padding: 3rem 1.2rem; }
 
