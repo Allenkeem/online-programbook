@@ -16,6 +16,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', '')
 
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 60 * 60 * 24 * 7  # 7일 캐시
 
 
 def get_db():
@@ -131,21 +132,39 @@ def save_upload(file, prefix='img', max_size=1200, quality=85):
         return None
     try:
         from PIL import Image
-        import io
         img = Image.open(file.stream)
         if img.mode in ('RGBA', 'P', 'LA'):
             img = img.convert('RGB')
+        ts = int(time.time() * 1000)
+
+        # 썸네일 (400px) — 카드 미리보기용
+        thumb = img.copy()
+        thumb.thumbnail((400, 400), Image.LANCZOS)
+        thumb_filename = secure_filename(f"{prefix}_{ts}_t.jpg")
+        thumb.save(os.path.join(UPLOAD_FOLDER, thumb_filename), 'JPEG', quality=80, optimize=True)
+
+        # 원본 (1200px) — 라이트박스/모달용
         img.thumbnail((max_size, max_size), Image.LANCZOS)
-        filename = secure_filename(f"{prefix}_{int(time.time() * 1000)}.jpg")
+        filename = secure_filename(f"{prefix}_{ts}.jpg")
         img.save(os.path.join(UPLOAD_FOLDER, filename), 'JPEG', quality=quality, optimize=True)
+
         return filename
     except Exception:
-        # Pillow 없거나 변환 실패 시 원본 저장
         file.stream.seek(0)
         ext = file.filename.rsplit('.', 1)[1].lower()
         filename = secure_filename(f"{prefix}_{int(time.time() * 1000)}.{ext}")
         file.save(os.path.join(UPLOAD_FOLDER, filename))
         return filename
+
+
+def get_thumb_url(filename):
+    """썸네일(_t.jpg) 있으면 썸네일, 없으면 원본 반환"""
+    if not filename:
+        return None
+    thumb = filename.rsplit('.', 1)[0] + '_t.jpg'
+    if os.path.exists(os.path.join(UPLOAD_FOLDER, thumb)):
+        return url_for('static', filename=f'uploads/{thumb}')
+    return url_for('static', filename=f'uploads/{filename}')
 
 
 def login_required(f):
@@ -208,6 +227,7 @@ def index():
                     'actor': c['actor_name'],
                     'bio': c['actor_bio'] or '',
                     'photos': [url_for('static', filename=f"uploads/{c[k]}") for k in ('actor_photo','actor_photo2','actor_photo3') if c[k]],
+                    'thumbs': [get_thumb_url(c[k]) for k in ('actor_photo','actor_photo2','actor_photo3') if c[k]],
                     'message': c['message'] or '',
                     'q1': c['q1'] or '',
                     'q2': c['q2'] or '',
@@ -226,6 +246,7 @@ def index():
                     'name': s['name'],
                     'play_name': s['play_name'] or '',
                     'photos': [url_for('static', filename=f"uploads/{s[k]}") for k in ('photo','photo2','photo3') if s[k]],
+                    'thumbs': [get_thumb_url(s[k]) for k in ('photo','photo2','photo3') if s[k]],
                     'message': s['message'] or '',
                     'q1': s['q1'] or '',
                     'q2': s['q2'] or '',
