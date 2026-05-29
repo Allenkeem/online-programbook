@@ -400,9 +400,13 @@ function renderTeam(perf, teamName) {
     const cast  = (perf.cast  || []).filter(c => c.character === teamName);
     const staff = (perf.staff || []).filter(s => s.play_name  === teamName);
 
-    if (play && play.description) {
+    if (play && (play.description || play.director_note)) {
         html += `<div class="detail-section"><div class="section-inner">
-            <p class="synopsis-text" style="font-style:italic;">${esc(play.description)}</p>
+            ${play.description ? `<p class="synopsis-text" style="font-style:italic;">${esc(play.description)}</p>` : ''}
+            ${play.director_note ? `<div style="margin-top:1rem;padding:0.8rem 1rem;background:rgba(232,184,75,0.05);border-radius:8px;border-left:3px solid var(--primary);">
+                <span style="font-size:0.72rem;font-weight:700;color:var(--primary);letter-spacing:0.05em;display:block;margin-bottom:0.4rem;">연출의도</span>
+                <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.8;margin:0;">${esc(play.director_note)}</p>
+            </div>` : ''}
         </div></div>`;
         secIdx++;
     }
@@ -411,7 +415,8 @@ function renderTeam(perf, teamName) {
         const cards = cast.map(c => personCard({
             photos: c.photos, character_role: c.character_role, role: c.bio, name: c.actor,
             message: c.message, q1: c.q1, q2: c.q2,
-            major: c.major, student_id: c.student_id, history: c.history
+            major: c.major, student_id: c.student_id, history: c.history,
+            character_intro: c.character_intro
         })).join('');
         html += section('출연진', `<div class="cast-grid">${cards}</div>`);
     }
@@ -466,7 +471,7 @@ function renderStaffDept(perf, deptName) {
 
 // ── Person card ───────────────────────────────────────────────────────────────
 function personCard(member) {
-    const { photos, character_role, role, name, message, q1, q2 } = member;
+    const { photos, character_role, role, name, message, q1, q2, character_intro } = member;
     const imgs = (Array.isArray(photos) ? photos : [photos]).filter(Boolean);
     // Single-quoted HTML attr: only &#39; needs escaping (&#39; decodes to ' via dataset API)
     const mj = JSON.stringify(member).replace(/'/g, '&#39;');
@@ -496,6 +501,7 @@ function personCard(member) {
         ${photoBlock}
         ${character_role ? `<span class="cast-character">${esc(character_role)}</span>` : (role ? `<span class="cast-character">${esc(role)}</span>` : '')}
         <span class="cast-actor">${esc(name)}</span>
+        ${character_intro ? `<p style="font-size:0.72rem;color:var(--text-muted);line-height:1.6;margin-top:0.35rem;padding:0 0.25rem;text-align:center;">${esc(character_intro)}</p>` : ''}
         ${message ? `<span class="cast-message">${esc(message)}</span>` : ''}
     </div>`;
 }
